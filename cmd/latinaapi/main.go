@@ -18,15 +18,16 @@ import (
 )
 
 var (
+	loc, _        = time.LoadLocation("Asia/Jakarta")
+	currentTime   = time.Now().In(loc)
 	botToken      = os.Getenv("BOT_TOKEN")
 	chatID        = os.Getenv("CHAT_ID")
 	sampleTopicID = os.Getenv("SAMPLE_TOPIC_ID")
 )
 
 func cronJob() {
-	loc, _ := time.LoadLocation("Asia/Jakarta")
 	schedule := gocron.NewScheduler(loc)
-	// schedule.SetMaxConcurrentJobs(1, gocron.RescheduleMode)
+	schedule.SetMaxConcurrentJobs(1, gocron.RescheduleMode)
 
 	schedule.Cron("30 * * * *").Tag("filter").Do(func() {
 		nodes := strings.Split(converter.ToRaw(account.Get("")), "\n")
@@ -40,6 +41,7 @@ func cronJob() {
 		fmt.Println("Scraping accounts ...")
 		helper.LogFuncToFile(func() {
 			latinasub.Start([]string{})
+			fmt.Printf("Finish Time: %s", currentTime.Format("2006-01-02 15:04:05"))
 		}, "scrape.log")
 	})
 
