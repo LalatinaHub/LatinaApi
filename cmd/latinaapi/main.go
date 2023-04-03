@@ -29,15 +29,17 @@ func cronJob() {
 	schedule := gocron.NewScheduler(loc)
 	schedule.SetMaxConcurrentJobs(1, gocron.RescheduleMode)
 
-	schedule.Cron("30 * * * *").Tag("filter").Do(func() {
+	schedule.Cron("10 * * * *").Tag("filter").Do(func() {
 		nodes := strings.Split(converter.ToRaw(account.Get("")), "\n")
 		if len(nodes) > 500 {
 			fmt.Println("Filtering accounts ...")
-			latinasub.Start(nodes)
+			helper.LogFuncToFile(func() {
+				latinasub.Start(nodes)
+			}, "scrape.log")
 		}
 	})
 
-	schedule.Cron("0 */12 * * *").Tag("scrape").Do(func() {
+	schedule.Cron("50 */8 * * *").Tag("scrape").Do(func() {
 		fmt.Println("Scraping accounts ...")
 		helper.LogFuncToFile(func() {
 			latinasub.Start([]string{})
@@ -66,6 +68,7 @@ func cronJob() {
 	}
 
 	schedule.StartAsync()
+	// schedule.RunByTag("scrape")
 }
 
 func checkDir() {
