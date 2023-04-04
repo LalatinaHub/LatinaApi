@@ -19,7 +19,6 @@ import (
 
 var (
 	loc, _        = time.LoadLocation("Asia/Jakarta")
-	currentTime   = time.Now().In(loc)
 	botToken      = os.Getenv("BOT_TOKEN")
 	chatID        = os.Getenv("CHAT_ID")
 	sampleTopicID = os.Getenv("SAMPLE_TOPIC_ID")
@@ -36,6 +35,9 @@ func cronJob() {
 			helper.LogFuncToFile(func() {
 				latinasub.Start(nodes)
 			}, "scrape.log")
+		} else {
+			fmt.Println("No accounts found!")
+			schedule.RunByTag("scrape")
 		}
 	})
 
@@ -43,7 +45,6 @@ func cronJob() {
 		fmt.Println("Scraping accounts ...")
 		helper.LogFuncToFile(func() {
 			latinasub.Start([]string{})
-			fmt.Printf("Finish Time: %s", currentTime.Format("2006-01-02 15:04:05"))
 		}, "scrape.log")
 	})
 
