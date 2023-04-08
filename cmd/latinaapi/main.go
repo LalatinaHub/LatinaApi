@@ -28,7 +28,7 @@ func cronJob() {
 	schedule := gocron.NewScheduler(loc)
 	schedule.SetMaxConcurrentJobs(1, gocron.RescheduleMode)
 
-	schedule.Cron("10 * * * *").Tag("filter").Do(func() {
+	schedule.Cron("10 */3 * * *").Tag("filter").Do(func() {
 		nodes := strings.Split(converter.ToRaw(account.Get("")), "\n")
 		if len(nodes) > 500 {
 			fmt.Println("Filtering accounts ...")
