@@ -19,7 +19,22 @@ func GetHandler(c *gin.Context) {
 	// Build headers and filters
 	disposition := "filename=FUCKMETILLDAYLIGHT"
 	filter := helper.BuildFilter(c)
-	proxies := account.PopulateBugs(account.Get(filter), cdn, sni)
+	proxies := account.Get(filter)
+
+	if c.Query("ip") == "1" {
+		for i := 0; i < len(proxies); i++ {
+			ip := proxies[i].Ip
+
+			if ip != "" {
+				proxies[i].Server = ip
+				proxies[i].Host = ip
+				proxies[i].SNI = ip
+			}
+		}
+	}
+
+	// Populate bugs
+	proxies = account.PopulateBugs(proxies, cdn, sni)
 
 	// Set headers and filters
 	c.Header("Content-Disposition", disposition)

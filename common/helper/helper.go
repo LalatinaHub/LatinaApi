@@ -44,7 +44,7 @@ func BuildFilter(c *gin.Context) string {
 
 	for key, value := range c.Request.URL.Query() {
 		switch key {
-		case "format", "cdn", "sni", "limit": // Ignore special queries
+		case "format", "cdn", "sni", "limit", "ip": // Ignore special queries
 		case "include":
 			var includeFilter []string
 			includes := strings.Split(value[0], ",")
