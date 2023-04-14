@@ -28,7 +28,7 @@ func cronJob() {
 	schedule := gocron.NewScheduler(loc)
 	schedule.SetMaxConcurrentJobs(1, gocron.RescheduleMode)
 
-	schedule.Cron("10 */3 * * *").Tag("filter").Do(func() {
+	schedule.Cron("00 */6 * * *").Tag("filter").Do(func() {
 		nodes := strings.Split(converter.ToRaw(account.Get("")), "\n")
 		if len(nodes) > 500 {
 			fmt.Println("Filtering accounts ...")
@@ -41,7 +41,7 @@ func cronJob() {
 		}
 	})
 
-	schedule.Cron("50 */8 * * *").Tag("scrape").Do(func() {
+	schedule.Every(1).Day().At("09:00").Tag("scrape").Do(func() {
 		fmt.Println("Scraping accounts ...")
 		helper.LogFuncToFile(func() {
 			latinasub.Start([]string{})
