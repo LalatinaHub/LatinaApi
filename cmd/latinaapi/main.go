@@ -18,6 +18,7 @@ import (
 )
 
 var (
+	filterCron    = os.Getenv("FILTER_CRON")
 	loc, _        = time.LoadLocation("Asia/Jakarta")
 	botToken      = os.Getenv("BOT_TOKEN")
 	chatID        = os.Getenv("CHAT_ID")
@@ -28,7 +29,11 @@ func cronJob() {
 	schedule := gocron.NewScheduler(loc)
 	schedule.SetMaxConcurrentJobs(1, gocron.RescheduleMode)
 
-	schedule.Cron("00 */6 * * *").Tag("filter").Do(func() {
+	if filterCron == "" {
+		filterCron = "00 */6 * * *"
+	}
+
+	schedule.Cron(filterCron).Tag("filter").Do(func() {
 		nodes := strings.Split(converter.ToRaw(account.Get("")), "\n")
 		if len(nodes) > 500 {
 			fmt.Println("Filtering accounts ...")
