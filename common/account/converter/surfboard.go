@@ -20,6 +20,7 @@ func ToSurfboard(accounts []db.DBScheme) string {
 
 	for _, account := range accounts {
 		var proxy string
+		account.Remark = strings.ReplaceAll(account.Remark, ",", "")
 		remarks = append(remarks, account.Remark)
 
 		switch account.VPN {
