@@ -12,11 +12,21 @@ import (
 )
 
 func ToBfa(accounts []db.DBScheme) option.Options {
-	options := option.Options{
+	var (
+		tags      []string
+		outbounds []option.Outbound
+	)
+	for _, proxy := range strings.Split(ToRaw(accounts), "\n") {
+		outbound := account.New(proxy).Outbound
+		outbounds = append(outbounds, outbound)
+		tags = append(tags, outbound.Tag)
+	}
+
+	return option.Options{
 		Log: &option.LogOptions{
-			Disabled:  true,
+			Disabled:  false,
 			Level:     "error",
-			Timestamp: true,
+			Timestamp: false,
 		},
 		DNS: &option.DNSOptions{
 			Servers: []option.DNSServerOptions{
@@ -44,7 +54,7 @@ func ToBfa(accounts []db.DBScheme) option.Options {
 				},
 			},
 		},
-		Outbounds: []option.Outbound{
+		Outbounds: append([]option.Outbound{
 			{
 				Type: "direct",
 				Tag:  "direct",
@@ -59,30 +69,44 @@ func ToBfa(accounts []db.DBScheme) option.Options {
 			},
 			{
 				Type: "selector",
-				Tag:  "proxies",
+				Tag:  "tunnel",
 				SelectorOptions: option.SelectorOutboundOptions{
-					Outbounds: []string{},
+					Outbounds: []string{"urltest", "selector"},
+				},
+			},
+			{
+				Type: "urltest",
+				Tag:  "urltest",
+				URLTestOptions: option.URLTestOutboundOptions{
+					Outbounds: tags,
 				},
 			},
 			{
 				Type: "selector",
-				Tag:  "ADS",
+				Tag:  "selector",
+				SelectorOptions: option.SelectorOutboundOptions{
+					Outbounds: tags,
+				},
+			},
+			{
+				Type: "selector",
+				Tag:  "ads",
 				SelectorOptions: option.SelectorOutboundOptions{
 					Outbounds: []string{
 						"block",
 						"direct",
-						"proxies",
+						"tunnel",
 					},
 				},
 			},
-		},
+		}, outbounds...),
 		Route: &option.RouteOptions{
 			Rules: []option.Rule{
 				{
 					Type: C.RuleTypeDefault,
 					DefaultOptions: option.DefaultRule{
 						Geosite:  option.Listable[string]{"category-ads-all"},
-						Outbound: "ADS",
+						Outbound: "ads",
 					},
 				},
 				{
@@ -94,7 +118,7 @@ func ToBfa(accounts []db.DBScheme) option.Options {
 					},
 				},
 			},
-			Final:               "proxies",
+			Final:               "tunnel",
 			FindProcess:         true,
 			AutoDetectInterface: true,
 			OverrideAndroidVPN:  true,
@@ -107,12 +131,4 @@ func ToBfa(accounts []db.DBScheme) option.Options {
 			},
 		},
 	}
-
-	for _, proxy := range strings.Split(ToRaw(accounts), "\n") {
-		account := account.New(proxy)
-		options.Outbounds = append(options.Outbounds, account.Outbound)
-		options.Outbounds[3].SelectorOptions.Outbounds = append(options.Outbounds[3].SelectorOptions.Outbounds, account.Outbound.Tag)
-	}
-
-	return options
 }

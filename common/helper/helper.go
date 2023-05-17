@@ -47,36 +47,32 @@ func BuildFilter(c *gin.Context) string {
 		case "format", "cdn", "sni", "limit", "ip": // Ignore special queries
 		case "include":
 			var includeFilter []string
-			includes := strings.Split(value[0], ",")
 
-			for _, include := range includes {
+			for _, include := range strings.Split(value[0], ",") {
 				includeFilter = append(includeFilter, fmt.Sprintf(`REMARK ILIKE '%%%s%%'`, include))
 			}
 
 			filter = append(filter, fmt.Sprintf("(%s)", strings.Join(includeFilter[:], " OR ")))
 		case "exclude":
 			var excludeFilter []string
-			excludes := strings.Split(value[0], ",")
 
-			for _, exclude := range excludes {
+			for _, exclude := range strings.Split(value[0], ",") {
 				excludeFilter = append(excludeFilter, fmt.Sprintf(`REMARK NOT ILIKE '%%%s%%'`, exclude))
 			}
 
 			filter = append(filter, fmt.Sprintf("(%s)", strings.Join(excludeFilter[:], " AND ")))
 		case "cc":
 			var ccFilter []string
-			ccs := strings.Split(value[0], ",")
 
-			for _, cc := range ccs {
+			for _, cc := range strings.Split(value[0], ",") {
 				ccFilter = append(ccFilter, fmt.Sprintf(`COUNTRY_CODE='%s'`, cc))
 			}
 
 			filter = append(filter, fmt.Sprintf("(%s)", strings.Join(ccFilter[:], " OR ")))
 		case "mode":
 			var modeFilter []string
-			modes := strings.Split(value[0], ",")
 
-			for _, mode := range modes {
+			for _, mode := range strings.Split(value[0], ",") {
 				modeFilter = append(modeFilter, fmt.Sprintf(`CONN_MODE LIKE '%%%s%%'`, mode))
 			}
 
@@ -86,18 +82,25 @@ func BuildFilter(c *gin.Context) string {
 			filter = append(filter, fmt.Sprintf(`%s=%d`, strings.ToUpper(key), tls))
 		case "network", "transport":
 			var transportFilter []string
-			transports := strings.Split(value[0], ",")
 
-			for _, transport := range transports {
+			for _, transport := range strings.Split(value[0], ",") {
 				transportFilter = append(transportFilter, fmt.Sprintf(`TRANSPORT LIKE '%%%s%%'`, transport))
 			}
 
 			filter = append(filter, fmt.Sprintf("(%s)", strings.Join(transportFilter[:], " OR ")))
+		case "port":
+			var portFilter []string
+
+			for _, portStr := range strings.Split(value[0], ",") {
+				port, _ := strconv.Atoi(portStr)
+				portFilter = append(portFilter, fmt.Sprintf(`SERVER_PORT=%d`, port))
+			}
+
+			filter = append(filter, fmt.Sprintf("(%s)", strings.Join(portFilter[:], " OR ")))
 		default:
 			var valueFilter []string
-			values := strings.Split(value[0], ",")
 
-			for _, value := range values {
+			for _, value := range strings.Split(value[0], ",") {
 				valueFilter = append(valueFilter, fmt.Sprintf(`%s='%s'`, strings.ToUpper(key), value))
 			}
 

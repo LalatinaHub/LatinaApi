@@ -46,7 +46,7 @@ func GetHandler(c *gin.Context) {
 		c.String(http.StatusOK, strings.Replace(converter.ToSurfboard(proxies), "URL_PLACEHOLDER", apiHelper.GetRequestedURL(c), 1))
 	case "raw":
 		c.String(http.StatusOK, converter.ToRaw(proxies))
-	case "bfa":
+	case "bfa", "sfa":
 		c.JSON(http.StatusOK, converter.ToBfa(proxies))
 	default:
 		c.JSON(http.StatusOK, proxies)
