@@ -14,7 +14,7 @@ import (
 	C "github.com/sagernet/sing-box/constant"
 )
 
-func ToRaw(accounts []db.DBScheme) string {
+func ToRaw(accounts []db.DBScheme, args ...string) string {
 	var result []string
 
 	for _, account := range accounts {

@@ -8,7 +8,7 @@ import (
 	C "github.com/sagernet/sing-box/constant"
 )
 
-func ToClash(accounts []db.DBScheme) string {
+func ToClash(accounts []db.DBScheme, args ...string) string {
 	result := []string{"proxies:"}
 	result = append(result, fmt.Sprintf("    # %s", "Clash have inconsistent configuration for SS between V2ray and OBFS plugin"))
 	result = append(result, fmt.Sprintf("    # %s", "So i'm lazy to implement those plugins, unless someone PR it or until i got very motivated"))
@@ -55,6 +55,16 @@ func ToClash(accounts []db.DBScheme) string {
 			proxy = append(proxy, fmt.Sprintf("    protocol: %s", account.Protocol))
 			proxy = append(proxy, fmt.Sprintf("    protocol-param: %s", account.ProtocolParam))
 			proxy = append(proxy, fmt.Sprintf("    udp: %t", true))
+		}
+
+		for _, arg := range args {
+			values := strings.Split(arg, ":")
+
+			if len(values) >= 2 {
+				proxy = append(proxy, fmt.Sprintf("    %s: %s", values[0], values[1]))
+			} else {
+				proxy = append(proxy, fmt.Sprintf("    %s: true", arg))
+			}
 		}
 
 		switch account.Transport {

@@ -11,13 +11,36 @@ import (
 	dns "github.com/sagernet/sing-dns"
 )
 
-func ToBfa(accounts []db.DBScheme) option.Options {
+func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 	var (
+		tfo, xudp bool = false, false
 		tags      []string
 		outbounds []option.Outbound
 	)
-	for _, proxy := range strings.Split(ToRaw(accounts), "\n") {
+
+	for _, arg := range args {
+		switch arg {
+		case "tfo":
+			tfo = true
+		case "xudp":
+			xudp = true
+		}
+	}
+
+	for _, proxy := range strings.Split(ToRaw(accounts, args...), "\n") {
 		outbound := account.New(proxy).Outbound
+
+		switch outbound.Type {
+		case C.TypeVMess:
+			outbound.VMessOptions.TCPFastOpen = tfo
+
+			if xudp {
+				outbound.VMessOptions.PacketEncoding = "xudp"
+			}
+		case C.TypeVLESS:
+			outbound.VLESSOptions.TCPFastOpen = tfo
+		}
+
 		outbounds = append(outbounds, outbound)
 		tags = append(tags, outbound.Tag)
 	}

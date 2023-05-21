@@ -15,6 +15,7 @@ func GetHandler(c *gin.Context) {
 	format := c.Query("format")
 	cdn := strings.Split(c.DefaultQuery("cdn", ""), ",")
 	sni := strings.Split(c.DefaultQuery("sni", ""), ",")
+	args := strings.Split(c.DefaultQuery("arg", ""), ",")
 
 	// Build headers and filters
 	disposition := "filename=FUCKMETILLDAYLIGHT"
@@ -41,13 +42,13 @@ func GetHandler(c *gin.Context) {
 
 	switch format {
 	case "clash":
-		c.String(http.StatusOK, converter.ToClash(proxies))
+		c.String(http.StatusOK, converter.ToClash(proxies, args...))
 	case "surfboard":
-		c.String(http.StatusOK, strings.Replace(converter.ToSurfboard(proxies), "URL_PLACEHOLDER", apiHelper.GetRequestedURL(c), 1))
+		c.String(http.StatusOK, strings.Replace(converter.ToSurfboard(proxies, args...), "URL_PLACEHOLDER", apiHelper.GetRequestedURL(c), 1))
 	case "raw":
-		c.String(http.StatusOK, converter.ToRaw(proxies))
+		c.String(http.StatusOK, converter.ToRaw(proxies, args...))
 	case "bfa", "sfa":
-		c.JSON(http.StatusOK, converter.ToBfa(proxies))
+		c.JSON(http.StatusOK, converter.ToBfa(proxies, args...))
 	default:
 		c.JSON(http.StatusOK, proxies)
 	}

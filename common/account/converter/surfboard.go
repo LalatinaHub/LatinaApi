@@ -9,7 +9,7 @@ import (
 	C "github.com/sagernet/sing-box/constant"
 )
 
-func ToSurfboard(accounts []db.DBScheme) string {
+func ToSurfboard(accounts []db.DBScheme, args ...string) string {
 	var (
 		result           string
 		remarks, proxies []string
