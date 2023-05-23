@@ -4,10 +4,11 @@ go 1.20
 
 require (
 	github.com/LalatinaHub/LatinaBot v0.0.0-20230326033325-b6448c1bdf2f
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230321115334-9f12743854a5
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230523100059-2aa8df79f6dc
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-co-op/gocron v1.18.0
 	github.com/sagernet/sing-box v1.1.6-0.20230320113300-84904c52066e
+	github.com/sagernet/sing-dns v0.1.4
 )
 
 replace (
@@ -18,7 +19,7 @@ replace (
 require (
 	berty.tech/go-libtor v1.0.385 // indirect
 	github.com/Dreamacro/clash v1.14.0 // indirect
-	github.com/NicoNex/echotron/v3 v3.23.3 // indirect
+	github.com/NicoNex/echotron/v3 v3.25.0 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/bytedance/sonic v1.8.5 // indirect
@@ -62,7 +63,6 @@ require (
 	github.com/sagernet/quic-go v0.0.0-20230202071646-a8c8afb18b32 // indirect
 	github.com/sagernet/reality v0.0.0-20230312150606-35ea9af0e0b8 // indirect
 	github.com/sagernet/sing v0.2.1-0.20230318094614-4bbf5f2c3046 // indirect
-	github.com/sagernet/sing-dns v0.1.4 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.0 // indirect
 	github.com/sagernet/sing-shadowtls v0.1.0 // indirect
 	github.com/sagernet/sing-tun v0.1.3-0.20230315134716-fe89bbded22d // indirect
@@ -111,6 +111,6 @@ require (
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
-	golang.org/x/text v0.8.0 // indirect
+	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 )

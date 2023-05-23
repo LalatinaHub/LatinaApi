@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/LalatinaHub/LatinaApi/common/member"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,13 +39,25 @@ func GetLastLog() string {
 
 func BuildFilter(c *gin.Context) string {
 	var (
-		filter []string
-		result string
+		limit    int  = 3
+		premium  bool = false
+		password      = c.Query("pass")
+		filter   []string
+		result   string
 	)
+
+	if expired, _ := member.GetMember(password); expired <= 0 {
+		limit = 10
+		premium = true
+	} else {
+		if c.Query("cc") == "" {
+			c.Request.URL.RawQuery = c.Request.URL.RawQuery + "&cc=SG,ID"
+		}
+	}
 
 	for key, value := range c.Request.URL.Query() {
 		switch key {
-		case "format", "cdn", "sni", "limit", "ip", "arg": // Ignore special queries
+		case "format", "cdn", "sni", "ip", "arg", "limit", "pass": // Ignore special queries
 		case "include":
 			var includeFilter []string
 
@@ -65,6 +78,13 @@ func BuildFilter(c *gin.Context) string {
 			var ccFilter []string
 
 			for _, cc := range strings.Split(value[0], ",") {
+				if !premium {
+					switch cc {
+					case "SG", "ID":
+					default:
+						continue
+					}
+				}
 				ccFilter = append(ccFilter, fmt.Sprintf(`COUNTRY_CODE='%s'`, cc))
 			}
 
@@ -113,18 +133,14 @@ func BuildFilter(c *gin.Context) string {
 	}
 
 	result = result + " ORDER BY RANDOM()"
-	if limit := c.Query("limit"); limit != "" {
-		intLimit, _ := strconv.Atoi(limit)
-		if intLimit > 10 {
-			intLimit = 10
-		} else if intLimit <= 0 {
-			intLimit = 1
-		}
 
-		result = result + fmt.Sprintf(" LIMIT %d", intLimit)
-	} else {
-		result = result + " LIMIT 10"
+	if c.Query("limit") != "" {
+		l, _ := strconv.Atoi(c.Query("limit"))
+		if l > 0 && l < limit {
+			limit = l
+		}
 	}
+	result = result + fmt.Sprintf(" LIMIT %d", limit)
 
 	return strings.ReplaceAll(result, `"`, "'")
 }
