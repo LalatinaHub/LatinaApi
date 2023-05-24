@@ -10,7 +10,7 @@ import (
 	"github.com/LalatinaHub/LatinaSub-go/db"
 )
 
-func isExists(id int64) bool {
+func IsExists(id int64) bool {
 	var isExists bool = false
 
 	query := fmt.Sprintf(`SELECT EXISTS(select * FROM users WHERE ID = %d)`, id)
@@ -29,8 +29,8 @@ func isExists(id int64) bool {
 
 func GetMember(id any) (int, string) {
 	var (
-		expired    int    = 1
-		key, query string = "", ""
+		expired         int    = 1
+		password, query string = "", ""
 	)
 
 	if reflect.TypeOf(id).Kind() == reflect.String {
@@ -41,21 +41,21 @@ func GetMember(id any) (int, string) {
 
 	rows, err := db.New().Conn().Query(query)
 	if err != nil {
-		return expired, key
+		return expired, password
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		rows.Scan(&expired, &key)
+		rows.Scan(&expired, &password)
 	}
 
-	return expired, key
+	return expired, password
 }
 
 func UpdateMember(id int64, subs int) bool {
 	var query string
 
-	if isExists(id) {
+	if IsExists(id) {
 		query = fmt.Sprintf(`UPDATE users SET EXPIRED = NOW() + INTERVAL '%d MONTH' WHERE ID = %d`, subs, id)
 	} else {
 		hash := GenerateHash(strconv.FormatInt(id, 10))
@@ -72,6 +72,10 @@ func UpdateMember(id int64, subs int) bool {
 }
 
 func ChangePassword(id int64, password string) bool {
+	if _, isExists := GetMember(password); isExists != "" {
+		return false
+	}
+
 	query := fmt.Sprintf(`UPDATE users SET PASSWORD = '%s' WHERE ID = %d`, password, id)
 	_, err := db.New().Conn().Exec(query)
 	if err != nil {

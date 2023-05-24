@@ -12,14 +12,25 @@ import (
 )
 
 func GetHandler(c *gin.Context) {
-	format := c.Query("format")
-	cdn := strings.Split(c.DefaultQuery("cdn", ""), ",")
-	sni := strings.Split(c.DefaultQuery("sni", ""), ",")
-	args := strings.Split(c.DefaultQuery("arg", ""), ",")
+	var (
+		format   = c.Query("format")
+		password = c.Query("pass")
+		cdn      = strings.Split(c.DefaultQuery("cdn", ""), ",")
+		sni      = strings.Split(c.DefaultQuery("sni", ""), ",")
+		args     = strings.Split(c.DefaultQuery("arg", ""), ",")
+	)
 
 	// Build headers and filters
 	disposition := "filename=FUCKMETILLDAYLIGHT"
 	filter := helper.BuildFilter(c)
+
+	// Authenticate user
+	if filter == "" || password == "" {
+		c.String(http.StatusUnauthorized, "Password invalid / not provided !")
+		return
+	}
+
+	// Get proxies account
 	proxies := account.Get(filter)
 
 	if c.Query("ip") == "1" {

@@ -46,13 +46,17 @@ func BuildFilter(c *gin.Context) string {
 		result   string
 	)
 
-	if expired, _ := member.GetMember(password); expired <= 0 {
-		limit = 10
-		premium = true
-	} else {
-		if c.Query("cc") == "" {
-			c.Request.URL.RawQuery = c.Request.URL.RawQuery + "&cc=SG,ID"
+	if expired, password := member.GetMember(password); password != "" {
+		if expired <= 0 {
+			limit = 10
+			premium = true
+		} else {
+			if c.Query("cc") == "" {
+				c.Request.URL.RawQuery = c.Request.URL.RawQuery + "&cc=SG,ID"
+			}
 		}
+	} else {
+		return result
 	}
 
 	for key, value := range c.Request.URL.Query() {
