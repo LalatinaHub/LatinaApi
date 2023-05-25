@@ -1,7 +1,6 @@
 package converter
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -85,22 +84,21 @@ func ToRaw(accounts []db.DBScheme, args ...string) string {
 			result = append(result, u.String())
 		case C.TypeShadowsocks:
 			var (
-				cred   string = helper.EncodeToBase64(fmt.Sprintf("%s:%s", account.Method, account.Password)) + fmt.Sprintf("@%s:%d", account.Server, account.ServerPort)
-				plugin string = ""
+				cred     string = helper.EncodeToBase64(fmt.Sprintf("%s:%s", account.Method, account.Password)) + fmt.Sprintf("@%s:%d", account.Server, account.ServerPort)
+				plugin   string = ""
+				obfsMode string = "http"
 			)
 
-			if account.Plugin != "" {
-				plugin = "?plugin=" + account.Plugin + ";" + account.PluginOpts
+			if account.TLS {
+				obfsMode = "tls"
+			}
+
+			switch account.Plugin {
+			default:
+				plugin = "?plugin=obfs-local;obfs=" + obfsMode + ";obfs-host=" + account.SNI
 			}
 
 			result = append(result, "ss://"+cred+plugin+"#"+url.QueryEscape(account.Remark))
-		case C.TypeShadowsocksR:
-			password := helper.EncodeToBase64(account.Password)
-			remarks := helper.EncodeToBase64(account.Remark)
-			protoParam := helper.EncodeToBase64(account.ProtocolParam)
-			obfsParam := helper.EncodeToBase64(account.OBFSParam)
-
-			result = append(result, "ssr://"+base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%d:%s:%s:%s:%s/?remarks=%s&protoparam=%s&obfsparam=%s", account.Server, account.ServerPort, account.Protocol, account.Method, account.OBFS, password, remarks, protoParam, obfsParam))))
 		}
 	}
 

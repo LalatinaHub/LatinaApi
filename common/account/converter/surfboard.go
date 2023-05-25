@@ -29,8 +29,13 @@ func ToSurfboard(accounts []db.DBScheme, args ...string) string {
 		case C.TypeTrojan:
 			proxy = fmt.Sprintf("%s=%s,%s,%d,password=%s,udp-relay=true,tls=%t,skip-cert-verify=%t,sni=%s", account.Remark, account.VPN, account.Server, account.ServerPort, account.Password, account.TLS, true, account.SNI)
 		case C.TypeShadowsocks:
-			// WIP
-			// proxy = fmt.Sprintf("%s=%s,%s,%d,encrypt-method=%s,password=%s,udp-relay=true,obfs=%s,obfs-host=%s,obfs-uri=%s", account.Remark, account.VPN, account.Server, account.ServerPort, account.Method, account.Password, obfs, account.Host, account.Path)
+			obfsMode := "http"
+
+			if account.TLS {
+				obfsMode = "tls"
+			}
+
+			proxy = fmt.Sprintf("%s=%s,%s,%d,encrypt-method=%s,password=%s,udp-relay=true,obfs=%s,obfs-host=%s,obfs-uri=/", account.Remark, account.VPN, account.Server, account.ServerPort, account.Method, account.Password, obfsMode, account.Host)
 		}
 
 		switch account.Transport {

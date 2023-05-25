@@ -39,6 +39,8 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 			}
 		case C.TypeVLESS:
 			outbound.VLESSOptions.TCPFastOpen = tfo
+		case C.TypeShadowsocks:
+			outbound.ShadowsocksOptions.TCPFastOpen = tfo
 		}
 
 		outbounds = append(outbounds, outbound)
@@ -56,6 +58,7 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 				{
 					Tag:     "dns_remote",
 					Address: "8.8.8.8",
+					Detour:  "direct",
 				},
 			},
 			DNSClientOptions: option.DNSClientOptions{
@@ -65,7 +68,17 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		},
 		Inbounds: []option.Inbound{
 			{
-				Type: "tun",
+				Type: C.TypeMixed,
+				Tag:  "mixed-in",
+				MixedOptions: option.HTTPMixedInboundOptions{
+					ListenOptions: option.ListenOptions{
+						Listen:     option.NewListenAddress(netip.IPv4Unspecified()),
+						ListenPort: 2080,
+					},
+				},
+			},
+			{
+				Type: C.TypeTun,
 				Tag:  "tun-in",
 				TunOptions: option.TunInboundOptions{
 					Inet4Address: option.Listable[option.ListenPrefix]{option.ListenPrefix(netip.MustParsePrefix("172.19.0.1/28"))},

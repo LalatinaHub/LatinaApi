@@ -3,12 +3,13 @@ module github.com/LalatinaHub/LatinaApi
 go 1.20
 
 require (
-	github.com/LalatinaHub/LatinaBot v0.0.0-20230524023739-417856a8b745
+	github.com/LalatinaHub/LatinaBot v0.0.0-20230524032043-fd435b47410e
 	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230523100059-2aa8df79f6dc
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-co-op/gocron v1.18.0
 	github.com/sagernet/sing-box v1.1.6-0.20230320113300-84904c52066e
 	github.com/sagernet/sing-dns v0.1.4
+	github.com/sethvargo/go-password v0.2.0
 )
 
 replace (

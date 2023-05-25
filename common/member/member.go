@@ -1,13 +1,11 @@
 package member
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"reflect"
-	"strconv"
 
 	"github.com/LalatinaHub/LatinaSub-go/db"
+	"github.com/sethvargo/go-password/password"
 )
 
 func IsExists(id int64) bool {
@@ -58,8 +56,8 @@ func UpdateMember(id int64, subs int) bool {
 	if IsExists(id) {
 		query = fmt.Sprintf(`UPDATE users SET EXPIRED = NOW() + INTERVAL '%d MONTH' WHERE ID = %d`, subs, id)
 	} else {
-		hash := GenerateHash(strconv.FormatInt(id, 10))
-		query = fmt.Sprintf(`INSERT INTO users (ID, EXPIRED, PASSWORD) VALUES (%d, NOW() + INTERVAL '%d MONTH', '%s')`, id, subs, hash)
+		password := GeneratePassword()
+		query = fmt.Sprintf(`INSERT INTO users (ID, EXPIRED, PASSWORD) VALUES (%d, NOW() + INTERVAL '%d MONTH', '%s')`, id, subs, password)
 	}
 
 	_, err := db.New().Conn().Exec(query)
@@ -71,22 +69,24 @@ func UpdateMember(id int64, subs int) bool {
 	return true
 }
 
-func ChangePassword(id int64, password string) bool {
-	if _, isExists := GetMember(password); isExists != "" {
-		return false
-	}
+func ChangePassword(id int64) bool {
+	password := GeneratePassword()
 
 	query := fmt.Sprintf(`UPDATE users SET PASSWORD = '%s' WHERE ID = %d`, password, id)
 	_, err := db.New().Conn().Exec(query)
 	if err != nil {
-		fmt.Println(err)
 		return false
 	}
 
 	return true
 }
 
-func GenerateHash(str string) string {
-	hash := md5.Sum([]byte(str))
-	return hex.EncodeToString(hash[:])
+func GeneratePassword() string {
+	password := password.MustGenerate(4, 0, 0, true, true)
+
+	if _, isExists := GetMember(password); isExists != "" {
+		return GeneratePassword()
+	}
+
+	return password
 }
