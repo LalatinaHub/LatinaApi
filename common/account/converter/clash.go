@@ -43,9 +43,7 @@ func ToClash(accounts []db.DBScheme, args ...string) string {
 			proxy = append(proxy, fmt.Sprintf("    sni: %s", account.SNI))
 			proxy = append(proxy, fmt.Sprintf("    network: %s", account.Transport))
 		case C.TypeShadowsocks:
-			var (
-				obfsMode = "http"
-			)
+			var obfsMode = "http"
 
 			if account.TLS {
 				obfsMode = "tls"
@@ -62,6 +60,22 @@ func ToClash(accounts []db.DBScheme, args ...string) string {
 				proxy = append(proxy, fmt.Sprintf("      mode: %s", obfsMode))
 				proxy = append(proxy, fmt.Sprintf("      host: %s", account.SNI))
 			}
+		case C.TypeShadowsocksR:
+			var obfsMode = "http"
+
+			if account.TLS {
+				obfsMode = "tls"
+			}
+
+			proxy = append(proxy, fmt.Sprintf("    type: %s", "ssr"))
+			proxy = append(proxy, fmt.Sprintf("    cipher: %s", account.Method))
+			proxy = append(proxy, fmt.Sprintf("    password: %s", account.Password))
+			proxy = append(proxy, fmt.Sprintf("    udp: %t", true))
+			proxy = append(proxy, fmt.Sprintf("    obfs: %s", account.OBFS))
+			proxy = append(proxy, fmt.Sprintf("    protocol: %s", account.Protocol))
+			proxy = append(proxy, fmt.Sprintf("    obfs-param: obfs=%s;obfs-host=%s", obfsMode, account.SNI))
+			proxy = append(proxy, fmt.Sprintf("    protocol-param: %s", account.ProtocolParam))
+
 		}
 
 		for _, arg := range args {

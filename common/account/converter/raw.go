@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -84,8 +85,7 @@ func ToRaw(accounts []db.DBScheme, args ...string) string {
 			result = append(result, u.String())
 		case C.TypeShadowsocks:
 			var (
-				cred     string = helper.EncodeToBase64(fmt.Sprintf("%s:%s", account.Method, account.Password)) + fmt.Sprintf("@%s:%d", account.Server, account.ServerPort)
-				plugin   string = ""
+				rawQuery string = ""
 				obfsMode string = "http"
 			)
 
@@ -95,10 +95,33 @@ func ToRaw(accounts []db.DBScheme, args ...string) string {
 
 			switch account.Plugin {
 			default:
-				plugin = "?plugin=obfs-local;obfs=" + obfsMode + ";obfs-host=" + account.SNI
+				rawQuery = "plugin=obfs-local;obfs=" + obfsMode + ";obfs-host=" + account.SNI
 			}
 
-			result = append(result, "ss://"+cred+plugin+"#"+url.QueryEscape(account.Remark))
+			u := url.URL{
+				Scheme:   "ss",
+				Host:     fmt.Sprintf("%s:%d", account.Server, account.ServerPort),
+				User:     url.User(helper.EncodeToBase64(fmt.Sprintf("%s:%s", account.Method, account.Password))),
+				Fragment: account.Remark,
+				RawQuery: rawQuery,
+			}
+
+			result = append(result, u.String())
+		case C.TypeShadowsocksR:
+			var (
+				obfsMode string = "http"
+				base     string = fmt.Sprintf("%s:%d:%s:%s:%s:%s", account.Server, account.ServerPort, account.Protocol, account.Method, account.OBFS, helper.EncodeToBase64(account.Password))
+			)
+
+			if m, _ := regexp.MatchString("tls", account.OBFS); m {
+				obfsMode = "tls"
+			}
+
+			obfsParam := "obfsparam=" + helper.EncodeToBase64("obfs="+obfsMode+";obfs-host="+account.SNI)
+			protoParam := "protoparam=" + helper.EncodeToBase64(account.ProtocolParam)
+			remarks := "remarks=" + helper.EncodeToBase64(account.Remark)
+
+			result = append(result, "ssr://"+helper.EncodeToBase64(base+"/?"+obfsParam+"&"+protoParam+"&"+remarks))
 		}
 	}
 
