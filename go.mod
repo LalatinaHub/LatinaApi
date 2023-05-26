@@ -10,6 +10,7 @@ require (
 	github.com/sagernet/sing-box v1.2.7-0.20230520041538-9ee0f0e74e50
 	github.com/sagernet/sing-dns v0.1.5-0.20230426113254-25d948c44223
 	github.com/sethvargo/go-password v0.2.0
+	github.com/ulule/limiter/v3 v3.11.2
 )
 
 replace (
@@ -55,6 +56,7 @@ require (
 	github.com/oschwald/maxminddb-golang v1.10.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.14 // indirect
 	github.com/pires/go-proxyproto v0.7.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
 	github.com/quic-go/qtls-go1-18 v0.2.0 // indirect
 	github.com/quic-go/qtls-go1-19 v0.3.0 // indirect
