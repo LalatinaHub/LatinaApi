@@ -20,7 +20,7 @@ RUN go mod edit -dropreplace="github.com/LalatinaHub/LatinaSub-go"
 RUN go get -v github.com/LalatinaHub/LatinaBot@main
 RUN go get -v github.com/LalatinaHub/LatinaSub-go@main
 RUN go mod download && go mod tidy && go mod verify
-RUN go build -tags with_grpc -o ./latinaapi ./cmd/latinaapi/main.go
+RUN go build -tags with_grpc,with_shadowsocksr -o ./latinaapi ./cmd/latinaapi/main.go
 
 ENV GIN_MODE=release
 ENV API_MODE=true

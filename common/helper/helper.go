@@ -39,9 +39,8 @@ func GetLastLog() string {
 
 func BuildFilter(c *gin.Context) string {
 	var (
-		limit    int  = 3
-		premium  bool = false
-		password      = c.Query("pass")
+		limit    int = 3
+		password     = c.Query("pass")
 		filter   []string
 		result   string
 	)
@@ -49,11 +48,41 @@ func BuildFilter(c *gin.Context) string {
 	if expired, password := member.GetMember(password); password != "" {
 		if expired <= 0 {
 			limit = 10
-			premium = true
 		} else {
-			if c.Query("cc") == "" {
-				c.Request.URL.RawQuery = c.Request.URL.RawQuery + "&cc=SG,ID"
+			queries := []string{}
+			for key, value := range c.Request.URL.Query() {
+				switch key {
+				case "vpn":
+					queries = append(queries, "vpn=vmess")
+				case "region":
+					queries = append(queries, "region=Asia")
+				case "cc":
+					countryList := []string{}
+					for _, cc := range strings.Split(value[0], ",") {
+						switch cc {
+						case "SG", "ID":
+							countryList = append(countryList, cc)
+						}
+					}
+
+					if len(countryList) < 1 {
+						countryList = append(countryList, []string{"SG, ID"}...)
+					}
+
+					queries = append(queries, "cc="+strings.Join(countryList[:], ","))
+				default:
+					queries = append(queries, key+"="+value[0])
+				}
 			}
+
+			if c.Query("cc") == "" {
+				queries = append(queries, "cc=SG,ID")
+			}
+			if c.Query("vpn") == "" {
+				queries = append(queries, "vpn=vmess")
+			}
+
+			c.Request.URL.RawQuery = strings.Join(queries[:], "&")
 		}
 	} else {
 		return result
@@ -82,13 +111,6 @@ func BuildFilter(c *gin.Context) string {
 			var ccFilter []string
 
 			for _, cc := range strings.Split(value[0], ",") {
-				if !premium {
-					switch cc {
-					case "SG", "ID":
-					default:
-						continue
-					}
-				}
 				ccFilter = append(ccFilter, fmt.Sprintf(`COUNTRY_CODE='%s'`, cc))
 			}
 

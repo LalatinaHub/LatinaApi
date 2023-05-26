@@ -82,7 +82,7 @@ func ChangePassword(id int64) bool {
 }
 
 func GeneratePassword() string {
-	password := password.MustGenerate(4, 0, 0, true, true)
+	password := password.MustGenerate(8, 2, 0, true, true)
 
 	if _, isExists := GetMember(password); isExists != "" {
 		return GeneratePassword()
