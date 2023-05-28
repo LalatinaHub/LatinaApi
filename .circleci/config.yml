@@ -18,11 +18,11 @@ jobs:
       - run:
           name: Build application Docker image
           command: |
-            docker build -t ${CONTAINER_ENDPOINT}/latinaapi:${CIRCLE_SHA1} .
+            docker build -t ${CONTAINER_ENDPOINT}/latinaapi:main .
       - deploy:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
               docker login $CONTAINER -u $DOCKER_USER -p $DOCKER_PASS
-              docker push ${CONTAINER_ENDPOINT}/latinaapi:${CIRCLE_SHA1}
+              docker push ${CONTAINER_ENDPOINT}/latinaapi:main
             fi
