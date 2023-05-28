@@ -18,6 +18,7 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		direct    string = ""
 		tags      []string
 		outbounds []option.Outbound
+		routes    []option.Rule
 	)
 
 	for _, arg := range args {
@@ -51,6 +52,27 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 
 		outbounds = append(outbounds, outbound)
 		tags = append(tags, outbound.Tag)
+	}
+
+	if direct != "" {
+		rule := option.Rule{
+			Type: C.RuleTypeDefault,
+			DefaultOptions: option.DefaultRule{
+				PackageName: option.Listable[string]{},
+				UserID:      option.Listable[int32]{},
+				Outbound:    "direct",
+			},
+		}
+
+		for _, d := range strings.Split(direct, "-") {
+			if uid, _ := strconv.Atoi(d); uid > 0 {
+				rule.DefaultOptions.UserID = append(rule.DefaultOptions.UserID, int32(uid))
+			} else {
+				rule.DefaultOptions.PackageName = append(rule.DefaultOptions.PackageName, d)
+			}
+		}
+
+		routes = append(routes, rule)
 	}
 
 	return option.Options{
@@ -143,7 +165,7 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 			},
 		}, outbounds...),
 		Route: &option.RouteOptions{
-			Rules: []option.Rule{
+			Rules: append([]option.Rule{
 				{
 					Type: C.RuleTypeDefault,
 					DefaultOptions: option.DefaultRule{
@@ -159,29 +181,7 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 						Outbound: "dns-out",
 					},
 				},
-				func() option.Rule {
-					rule := option.Rule{
-						Type: C.RuleTypeDefault,
-						DefaultOptions: option.DefaultRule{
-							PackageName: option.Listable[string]{},
-							UserID:      option.Listable[int32]{},
-							Outbound:    "direct",
-						},
-					}
-
-					if direct != "" {
-						for _, d := range strings.Split(direct, "-") {
-							if uid, _ := strconv.Atoi(d); uid > 0 {
-								rule.DefaultOptions.UserID = append(rule.DefaultOptions.UserID, int32(uid))
-							} else {
-								rule.DefaultOptions.PackageName = append(rule.DefaultOptions.PackageName, d)
-							}
-						}
-					}
-
-					return rule
-				}(),
-			},
+			}, routes...),
 			Final:               "tunnel",
 			FindProcess:         true,
 			AutoDetectInterface: true,
