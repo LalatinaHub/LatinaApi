@@ -2,6 +2,7 @@ package converter
 
 import (
 	"net/netip"
+	"strconv"
 	"strings"
 
 	"github.com/LalatinaHub/LatinaSub-go/account"
@@ -13,7 +14,8 @@ import (
 
 func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 	var (
-		tfo, xudp bool = false, false
+		tfo, xudp bool   = false, false
+		direct    string = ""
 		tags      []string
 		outbounds []option.Outbound
 	)
@@ -24,6 +26,10 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 			tfo = true
 		case "xudp":
 			xudp = true
+		}
+
+		if strings.HasPrefix(arg, "direct:") {
+			direct = strings.TrimPrefix(arg, "direct:")
 		}
 	}
 
@@ -153,6 +159,28 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 						Outbound: "dns-out",
 					},
 				},
+				func() option.Rule {
+					rule := option.Rule{
+						Type: C.RuleTypeDefault,
+						DefaultOptions: option.DefaultRule{
+							PackageName: option.Listable[string]{},
+							UserID:      option.Listable[int32]{},
+							Outbound:    "direct",
+						},
+					}
+
+					if direct != "" {
+						for _, d := range strings.Split(direct, "-") {
+							if uid, _ := strconv.Atoi(d); uid > 0 {
+								rule.DefaultOptions.UserID = append(rule.DefaultOptions.UserID, int32(uid))
+							} else {
+								rule.DefaultOptions.PackageName = append(rule.DefaultOptions.PackageName, d)
+							}
+						}
+					}
+
+					return rule
+				}(),
 			},
 			Final:               "tunnel",
 			FindProcess:         true,

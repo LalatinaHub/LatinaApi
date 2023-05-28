@@ -35,7 +35,7 @@ func cronJob() {
 
 	schedule.Cron(filterCron).Tag("filter").Do(func() {
 		nodes := strings.Split(converter.ToRaw(account.Get("")), "\n")
-		if len(nodes) > 500 {
+		if len(nodes) > 100 {
 			fmt.Println("Filtering accounts ...")
 			helper.LogFuncToFile(func() {
 				latinasub.Start(nodes)
