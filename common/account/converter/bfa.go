@@ -58,6 +58,7 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		rule := option.Rule{
 			Type: C.RuleTypeDefault,
 			DefaultOptions: option.DefaultRule{
+				Network:     option.Listable[string]{},
 				PackageName: option.Listable[string]{},
 				UserID:      option.Listable[int32]{},
 				Outbound:    "direct",
@@ -68,7 +69,12 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 			if uid, _ := strconv.Atoi(d); uid > 0 {
 				rule.DefaultOptions.UserID = append(rule.DefaultOptions.UserID, int32(uid))
 			} else {
-				rule.DefaultOptions.PackageName = append(rule.DefaultOptions.PackageName, d)
+				switch d {
+				case "udp", "tcp":
+					rule.DefaultOptions.Network = append(rule.DefaultOptions.Network, d)
+				default:
+					rule.DefaultOptions.PackageName = append(rule.DefaultOptions.PackageName, d)
+				}
 			}
 		}
 
