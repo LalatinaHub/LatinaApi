@@ -42,6 +42,6 @@ jobs:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
-              echo "$GITHUB_TOKEN" | docker login -u "dickymuliafiqri" --password-stdin
-              docker push "${CONTAINER_ENDPOINT}/app:main"
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              docker push ${CONTAINER_ENDPOINT}/latinaapi:main
             fi
