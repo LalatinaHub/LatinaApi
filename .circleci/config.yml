@@ -33,7 +33,7 @@ jobs:
           name: Save Docker image layer cache
           command: |
             mkdir -p /caches
-            docker save -o /caches/latinaapi.tar latinaapi
+            docker save -o /caches/latinaapi.tar ${CONTAINER_ENDPOINT}/latinaapi:main
       - save_cache:
           key: v1-{{ .Branch }}-{{ epoch }}
           paths:
