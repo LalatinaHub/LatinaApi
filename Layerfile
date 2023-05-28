@@ -17,6 +17,10 @@ RUN apt-get update && \
 # copy files from the repository into this staging server
 COPY . .
 
+SECRET ENV ADMIN_ID
+SECRET ENV BOT_TOKEN
+SECRET ENV DB_URL
+
 RUN docker build -t latinaapi .
 RUN docker run -d -p 8080:8080 latinaapi
 EXPOSE WEBSITE http://localhost:8080
