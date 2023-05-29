@@ -77,16 +77,9 @@ func cronJob() {
 	// schedule.RunByTag("scrape")
 }
 
-func checkDir() {
-	_, err := os.Stat("resources")
-	if err != nil {
-		panic("Could not find resources folder, exiting...")
-	}
-}
+
 
 func main() {
-	// Check directory
-	checkDir()
 
 	// Set cron job
 	cronJob()
