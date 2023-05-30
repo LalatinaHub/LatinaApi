@@ -23,10 +23,11 @@ stages:
           - bash: docker push $(imageName)
             displayName: Push docker image to container
       - job: RestartWebApp
+        dependsOn: BuildAndPush
         displayName: Restart WebApp
         steps:
           - task: AzureAppServiceManage@0
             inputs:
-              azureSubscription: "$(AZURE_SUBS)"
-              Action: "Restart Azure App Service"
-              WebAppName: "fool"
+              azureSubscription: 'Azure for Students Starter(da8c2850-a4f7-4cda-95d7-1e6ebd821a16)'
+              Action: 'Restart Azure App Service'
+              WebAppName: 'fool'
