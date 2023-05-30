@@ -1,28 +1,32 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
-- main
+  - main
 
 resources:
-- repo: self
+  - repo: self
 
 variables:
   imageName: "ghcr.io/lalatinahub/latinaapi:main"
 
 stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: BuildAndPush
-    displayName: Build and Push Docker Image
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - bash: docker login ghcr.io -u dickymuliafiqri -p $(DOCKER_PASS)
-      displayName: Login to docker container
-    - bash: docker build -t $(imageName) .
-      displayName: Build docker image
-    - bash: docker push $(imageName)
-      displayName: Push docker image to container
+  - stage: Build
+    displayName: Build image
+    jobs:
+      - job: BuildAndPush
+        displayName: Build and Push Docker Image
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - bash: docker login ghcr.io -u dickymuliafiqri -p $(DOCKER_PASS)
+            displayName: Login to docker container
+          - bash: docker build -t $(imageName) .
+            displayName: Build docker image
+          - bash: docker push $(imageName)
+            displayName: Push docker image to container
+      - job: RestartWebApp
+        displayName: Restart WebApp
+        steps:
+          - task: AzureAppServiceManage@0
+            inputs:
+              azureSubscription: "$(AZURE_SUBS)"
+              Action: "Restart Azure App Service"
+              WebAppName: "fool"
