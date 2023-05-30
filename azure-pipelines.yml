@@ -9,29 +9,20 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  imageName: "ghcr.io/lalatinahub/latinaapi:main"
 
 stages:
 - stage: Build
   displayName: Build image
   jobs:
-  - job: Build
-    displayName: Build Docker Image
+  - job: BuildAndPush
+    displayName: Build and Push Docker Image
     pool:
       vmImage: ubuntu-latest
     steps:
-    - task: Docker@2
-      displayName: Build an image
-      inputs:
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        tags: 'ghcr.io/lalatinahub/latinaapi:main'
-  - job: Push
-    displayName: Push Docker Image
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-      - bash: docker login ghcr.io -u dickymuliafiqri -p $(DOCKER_PASS)
-        displayName: Login to docker container
-      - bash: docker push ghcr.io/lalatinahub/latinaapi:main
-        displayName: Push docker image to container
+    - bash: docker login ghcr.io -u dickymuliafiqri -p $(DOCKER_PASS)
+      displayName: Login to docker container
+    - bash: docker build -t $(imageName) .
+      displayName: Build docker image
+    - bash: docker push $(imageName)
+      displayName: Push docker image to container
