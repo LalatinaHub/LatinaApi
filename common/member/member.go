@@ -25,16 +25,16 @@ func IsExists(id int64) bool {
 	return isExists
 }
 
-func GetMember(id any) (int, string) {
+func GetMember(cred any) (int, string) {
 	var (
 		expired         int    = 1
 		password, query string = "", ""
 	)
 
-	if reflect.TypeOf(id).Kind() == reflect.String {
-		query = fmt.Sprintf(`SELECT EXTRACT(DAY FROM NOW() - (SELECT EXPIRED FROM users WHERE PASSWORD = '%s')), PASSWORD FROM users WHERE PASSWORD = '%s'`, id, id)
+	if reflect.TypeOf(cred).Kind() == reflect.String {
+		query = fmt.Sprintf(`SELECT EXTRACT(DAY FROM NOW() - (SELECT EXPIRED FROM users WHERE PASSWORD = '%s')), PASSWORD FROM users WHERE PASSWORD = '%s'`, cred, cred)
 	} else {
-		query = fmt.Sprintf(`SELECT EXTRACT(DAY FROM NOW() - (SELECT EXPIRED FROM users WHERE ID = %d)), PASSWORD FROM users WHERE ID = %d`, id, id)
+		query = fmt.Sprintf(`SELECT EXTRACT(DAY FROM NOW() - (SELECT EXPIRED FROM users WHERE ID = %d)), PASSWORD FROM users WHERE ID = %d`, cred, cred)
 	}
 
 	rows, err := db.New().Conn().Query(query)

@@ -8,11 +8,14 @@ import (
 	"github.com/LalatinaHub/LatinaApi/common/account"
 	"github.com/LalatinaHub/LatinaApi/common/account/converter"
 	"github.com/LalatinaHub/LatinaApi/common/helper"
+	"github.com/LalatinaHub/LatinaApi/common/member"
+	"github.com/LalatinaHub/LatinaSub-go/db"
 	"github.com/gin-gonic/gin"
 )
 
 func GetHandler(c *gin.Context) {
 	var (
+		proxies  []db.DBScheme
 		format   = c.Query("format")
 		password = c.Query("pass")
 		cdn      = strings.Split(c.DefaultQuery("cdn", ""), ",")
@@ -31,7 +34,10 @@ func GetHandler(c *gin.Context) {
 	}
 
 	// Get proxies account
-	proxies := account.Get(filter)
+	if c.Query("premium") != "" {
+		proxies = append(proxies, member.GenerateDBSchemes(member.GetPremiumAccount(password), c)...)
+	}
+	proxies = append(proxies, account.Get(filter)...)
 
 	if c.Query("ip") == "1" {
 		for i := 0; i < len(proxies); i++ {

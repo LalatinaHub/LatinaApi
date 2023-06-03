@@ -90,7 +90,7 @@ func BuildFilter(c *gin.Context) string {
 
 	for key, value := range c.Request.URL.Query() {
 		switch key {
-		case "format", "cdn", "sni", "ip", "arg", "limit", "pass": // Ignore special queries
+		case "format", "cdn", "sni", "ip", "arg", "limit", "pass", "premium": // Ignore special queries
 		case "include":
 			var includeFilter []string
 
@@ -126,7 +126,7 @@ func BuildFilter(c *gin.Context) string {
 		case "tls":
 			tls, _ := strconv.Atoi(value[0])
 			filter = append(filter, fmt.Sprintf(`%s=%d`, strings.ToUpper(key), tls))
-		case "network", "transport":
+		case "network":
 			var transportFilter []string
 
 			for _, transport := range strings.Split(value[0], ",") {
