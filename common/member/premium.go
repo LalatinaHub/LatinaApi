@@ -172,7 +172,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 						}
 
 						switch vpn {
-						case C.TypeTrojan, C.TypeVLESS:
+						case C.TypeTrojan:
 							d.Password = accountData.Password
 						default:
 							d.UUID = accountData.Password

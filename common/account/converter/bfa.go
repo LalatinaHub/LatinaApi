@@ -1,25 +1,24 @@
 package converter
 
 import (
-	"net/netip"
-	"strconv"
+	"fmt"
+	"io"
 	"strings"
 
+	apiHelper "github.com/LalatinaHub/LatinaApi/api/helper"
 	"github.com/LalatinaHub/LatinaSub-go/account"
 	"github.com/LalatinaHub/LatinaSub-go/db"
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
-	dns "github.com/sagernet/sing-dns"
 )
 
 func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 	var (
-		tfo, xudp bool   = false, false
-		direct    string = ""
-		tags      []string
-		outbounds []option.Outbound
-		routes    []option.Rule
-		mux       *option.MultiplexOptions
+		baseConfig      = "https://raw.githubusercontent.com/iyarivky/sing-ribet/main/config/config.json"
+		tfo, xudp  bool = false, false
+		tags       []string
+		outbounds  []option.Outbound
+		mux        *option.MultiplexOptions
 	)
 
 	for _, arg := range args {
@@ -34,10 +33,6 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 				Protocol:   "smux",
 				MaxStreams: 32,
 			}
-		}
-
-		if strings.HasPrefix(arg, "direct:") {
-			direct = strings.TrimPrefix(arg, "direct:")
 		}
 	}
 
@@ -64,151 +59,34 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		tags = append(tags, outbound.Tag)
 	}
 
-	if direct != "" {
-		rule := option.Rule{
-			Type: C.RuleTypeDefault,
-			DefaultOptions: option.DefaultRule{
-				Network:     option.Listable[string]{},
-				PackageName: option.Listable[string]{},
-				UserID:      option.Listable[int32]{},
-				Outbound:    "direct",
-			},
-		}
+	var (
+		options option.Options
+		buf     = new(strings.Builder)
+	)
 
-		for _, d := range strings.Split(direct, "-") {
-			if uid, _ := strconv.Atoi(d); uid > 0 {
-				rule.DefaultOptions.UserID = append(rule.DefaultOptions.UserID, int32(uid))
-			} else {
-				switch d {
-				case "udp", "tcp":
-					rule.DefaultOptions.Network = append(rule.DefaultOptions.Network, d)
-				default:
-					rule.DefaultOptions.PackageName = append(rule.DefaultOptions.PackageName, d)
-				}
-			}
-		}
+	resp, err := apiHelper.Fetch(baseConfig)
+	if err != nil {
+		fmt.Println(err)
+		return option.Options{}
+	}
+	defer resp.Body.Close()
 
-		routes = append(routes, rule)
+	io.Copy(buf, resp.Body)
+	if resp.StatusCode == 200 {
+		options.UnmarshalJSON([]byte(buf.String()))
 	}
 
-	return option.Options{
-		Log: &option.LogOptions{
-			Disabled:  false,
-			Level:     "error",
-			Timestamp: false,
-		},
-		DNS: &option.DNSOptions{
-			Servers: []option.DNSServerOptions{
-				{
-					Tag:     "dns_remote",
-					Address: "8.8.8.8",
-					Detour:  "direct",
-				},
-			},
-			DNSClientOptions: option.DNSClientOptions{
-				Strategy: option.DomainStrategy(dns.DomainStrategyPreferIPv4),
-			},
-			Final: "dns_remote",
-		},
-		Inbounds: []option.Inbound{
-			{
-				Type: C.TypeMixed,
-				Tag:  "mixed-in",
-				MixedOptions: option.HTTPMixedInboundOptions{
-					ListenOptions: option.ListenOptions{
-						Listen:     option.NewListenAddress(netip.IPv4Unspecified()),
-						ListenPort: 2080,
-					},
-				},
-			},
-			{
-				Type: C.TypeTun,
-				Tag:  "tun-in",
-				TunOptions: option.TunInboundOptions{
-					Inet4Address: option.Listable[option.ListenPrefix]{option.ListenPrefix(netip.MustParsePrefix("172.19.0.1/28"))},
-					AutoRoute:    true,
-					Stack:        "system",
-					InboundOptions: option.InboundOptions{
-						SniffEnabled: true,
-					},
-				},
-			},
-		},
-		Outbounds: append([]option.Outbound{
-			{
-				Type: "direct",
-				Tag:  "direct",
-			},
-			{
-				Type: "block",
-				Tag:  "block",
-			},
-			{
-				Type: "dns",
-				Tag:  "dns-out",
-			},
-			{
-				Type: "selector",
-				Tag:  "tunnel",
-				SelectorOptions: option.SelectorOutboundOptions{
-					Outbounds: []string{"urltest", "selector"},
-				},
-			},
-			{
-				Type: "urltest",
-				Tag:  "urltest",
-				URLTestOptions: option.URLTestOutboundOptions{
-					Outbounds: tags,
-				},
-			},
-			{
-				Type: "selector",
-				Tag:  "selector",
-				SelectorOptions: option.SelectorOutboundOptions{
-					Outbounds: tags,
-				},
-			},
-			{
-				Type: "selector",
-				Tag:  "ads",
-				SelectorOptions: option.SelectorOutboundOptions{
-					Outbounds: []string{
-						"block",
-						"direct",
-						"tunnel",
-					},
-				},
-			},
-		}, outbounds...),
-		Route: &option.RouteOptions{
-			Rules: append([]option.Rule{
-				{
-					Type: C.RuleTypeDefault,
-					DefaultOptions: option.DefaultRule{
-						Geosite:  option.Listable[string]{"category-ads-all"},
-						Outbound: "ads",
-					},
-				},
-				{
-					Type: C.RuleTypeDefault,
-					DefaultOptions: option.DefaultRule{
-						Protocol: option.Listable[string]{"dns"},
-						Port:     option.Listable[uint16]{53},
-						Outbound: "dns-out",
-					},
-				},
-			}, routes...),
-			Final:               "tunnel",
-			FindProcess:         true,
-			AutoDetectInterface: true,
-			OverrideAndroidVPN:  true,
-		},
-		Experimental: &option.ExperimentalOptions{
-			ClashAPI: &option.ClashAPIOptions{
-				ExternalController: "0.0.0.0:9090",
-				ExternalUI:         "yacd",
-				StoreSelected:      true,
-			},
-		},
+	options.Outbounds = append(options.Outbounds, outbounds...)
+	for i, outbound := range options.Outbounds {
+		switch outbound.Tag {
+		case "Internet", "Lock Region ID":
+			options.Outbounds[i].SelectorOptions.Outbounds = append(options.Outbounds[i].SelectorOptions.Outbounds, tags...)
+		case "Best Latency":
+			options.Outbounds[i].URLTestOptions.Outbounds = append(options.Outbounds[i].URLTestOptions.Outbounds, tags...)
+		}
 	}
+
+	options.Experimental.ClashAPI.Secret = ""
+
+	return options
 }
