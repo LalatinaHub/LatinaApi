@@ -1,8 +1,11 @@
 package apiHelper
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,4 +27,17 @@ func GetRequestedURL(c *gin.Context) string {
 	}
 
 	return result + queries
+}
+
+func Fetch(link string) (*http.Response, error) {
+	httpClient := &http.Client{
+		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	return httpClient.Get(link)
 }

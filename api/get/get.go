@@ -34,10 +34,15 @@ func GetHandler(c *gin.Context) {
 	}
 
 	// Get proxies account
-	if c.Query("premium") != "" {
+	switch c.Query("premium") {
+	case "1":
+		proxies = append(proxies, account.Get(filter)...)
+	case "2":
 		proxies = append(proxies, member.GenerateDBSchemes(member.GetPremiumAccount(password), c)...)
+	default:
+		proxies = append(proxies, member.GenerateDBSchemes(member.GetPremiumAccount(password), c)...)
+		proxies = append(proxies, account.Get(filter)...)
 	}
-	proxies = append(proxies, account.Get(filter)...)
 
 	if c.Query("ip") == "1" {
 		for i := 0; i < len(proxies); i++ {
