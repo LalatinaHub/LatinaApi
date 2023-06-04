@@ -122,7 +122,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 			for _, network := range networks {
 				for _, mode := range modes {
 					for _, vpn := range vpns {
-						if (network == "tcp" || mode == "sni") && port == 80 {
+						if (network == "tcp" || mode == "sni") && (port == 80 || vpn == "vless") {
 							continue
 						} else if tls == "0" && port == 443 {
 							continue
