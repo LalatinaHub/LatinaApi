@@ -138,14 +138,24 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 							continue
 						}
 
-						tlsstr := "TLS"
+						var (
+							domain = accountData.Domain
+							tlsstr = "TLS"
+						)
+
+						switch network {
+						case "tcp":
+						default:
+							domain = fmt.Sprintf("%s.%s", network, domain)
+						}
+
 						if port == 80 || tls == "0" {
 							tlsstr = "NTLS"
 						}
 						remark := fmt.Sprintf("%d %s ✨ %s %s %s %s", len(result)+1, H.CCToEmoji(vpsInfo.CountryCode), vpsInfo.Org, strings.ToUpper(network), strings.ToUpper(mode), tlsstr)
 
 						d := db.DBScheme{
-							Server:        accountData.Domain,
+							Server:        domain,
 							Ip:            vpsInfo.Ip,
 							ServerPort:    port,
 							Security:      "auto",
@@ -156,13 +166,13 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 							ProtocolParam: "",
 							OBFS:          "",
 							OBFSParam:     "",
-							Host:          accountData.Domain,
+							Host:          domain,
 							TLS:           tls == "1",
 							Transport:     network,
 							Path:          "/" + vpn,
 							ServiceName:   vpn,
 							Insecure:      true,
-							SNI:           accountData.Domain,
+							SNI:           domain,
 							Remark:        remark,
 							ConnMode:      mode,
 							CountryCode:   vpsInfo.CountryCode,
