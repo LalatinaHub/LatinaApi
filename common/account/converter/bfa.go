@@ -86,6 +86,8 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		}
 	}
 
+	options.Route.GeoIP.DownloadURL = ""
+	options.Route.Geosite.DownloadURL = ""
 	options.Experimental.ClashAPI.Secret = ""
 
 	return options
