@@ -3,6 +3,7 @@ package member
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/LalatinaHub/LatinaSub-go/db"
 	"github.com/sethvargo/go-password/password"
@@ -51,16 +52,18 @@ func GetMember(cred any) (int, string) {
 }
 
 func UpdateMember(id int64, subs int) bool {
-	var query string
+	var queries []string
 
 	if IsExists(id) {
-		query = fmt.Sprintf(`UPDATE users SET EXPIRED = NOW() + INTERVAL '%d MONTH' WHERE ID = %d`, subs, id)
+		queries = append(queries, fmt.Sprintf(`UPDATE users SET EXPIRED = NOW() + INTERVAL '%d MONTH' WHERE ID = %d`, subs, id))
+		queries = append(queries, fmt.Sprintf("UPDATE premium SET quota = %d WHERE id = %d", 100000*subs, id))
 	} else {
 		password := GeneratePassword()
-		query = fmt.Sprintf(`INSERT INTO users (ID, EXPIRED, PASSWORD) VALUES (%d, NOW() + INTERVAL '%d MONTH', '%s')`, id, subs, password)
+		queries = append(queries, fmt.Sprintf(`INSERT INTO users (ID, EXPIRED, PASSWORD) VALUES (%d, NOW() + INTERVAL '%d MONTH', '%s')`, id, subs, password))
+		queries = append(queries, fmt.Sprintf(`INSERT INTO premium (ID, PASSWORD, TYPE, DOMAIN, QUOTA) VALUES (%d, default, 'dummy', 'dummy.com', 0)`, id))
 	}
 
-	_, err := db.New().Conn().Exec(query)
+	_, err := db.New().Conn().Exec(fmt.Sprintf("BEGIN; %s; COMMIT;", strings.Join(queries[:], ";")))
 	if err != nil {
 		fmt.Println(err)
 		return false

@@ -33,16 +33,14 @@ type PremiumData struct {
 func CreatePremiumAccount(id int64, vpn, domain string) bool {
 	var (
 		queries = []string{
-			fmt.Sprintf("INSERT INTO premium (id, password, type, domain, quota) VALUES(%d, default, '%s', '%s', %d) ON CONFLICT (id) DO UPDATE SET type = EXCLUDED.type", id, vpn, domain, 0),
+			fmt.Sprintf("INSERT INTO premium (id, type, domain) VALUES(%d, '%s', '%s') ON CONFLICT (id) DO UPDATE SET type = EXCLUDED.type, domain = EXCLUDED.domain", id, vpn, domain),
 			fmt.Sprintf("UPDATE domains SET populate = (SELECT COUNT(*) FROM premium WHERE domain = '%s') WHERE domain = '%s'", domain, domain),
 		}
 	)
 
-	for _, query := range queries {
-		_, err := db.New().Conn().Exec(query)
-		if err != nil {
-			return false
-		}
+	_, err := db.New().Conn().Exec(fmt.Sprintf("BEGIN; %s; COMMIT;", strings.Join(queries[:], ";")))
+	if err != nil {
+		return false
 	}
 
 	apiHelper.Fetch("https://" + domain + "/" + reload)
