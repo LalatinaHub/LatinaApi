@@ -27,12 +27,13 @@ type PremiumData struct {
 	Password string
 	VPN      string
 	Domain   string
+	Quota    int
 }
 
 func CreatePremiumAccount(id int64, vpn, domain string) bool {
 	var (
 		queries = []string{
-			fmt.Sprintf("INSERT INTO premium (id, password, type, domain) VALUES(%d, default, '%s', '%s') ON CONFLICT (id) DO UPDATE SET type = EXCLUDED.type", id, vpn, domain),
+			fmt.Sprintf("INSERT INTO premium (id, password, type, domain, quota) VALUES(%d, default, '%s', '%s', %d) ON CONFLICT (id) DO UPDATE SET type = EXCLUDED.type", id, vpn, domain, 0),
 			fmt.Sprintf("UPDATE domains SET populate = (SELECT COUNT(*) FROM premium WHERE domain = '%s') WHERE domain = '%s'", domain, domain),
 		}
 	)
@@ -63,6 +64,7 @@ func UpdatePremiumPassword(id int64, domain string) bool {
 func GetPremiumAccount(cred any) PremiumData {
 	var (
 		id, pass, vpn, domain sql.NullString
+		quota                 sql.NullInt64
 		query                 string
 	)
 
@@ -79,7 +81,10 @@ func GetPremiumAccount(cred any) PremiumData {
 	defer rows.Close()
 
 	for rows.Next() {
-		rows.Scan(&id, &pass, &vpn, &domain)
+		err := rows.Scan(&id, &pass, &vpn, &domain, &quota)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	return PremiumData{
@@ -87,6 +92,7 @@ func GetPremiumAccount(cred any) PremiumData {
 		Password: pass.String,
 		VPN:      vpn.String,
 		Domain:   domain.String,
+		Quota:    int(quota.Int64),
 	}
 }
 

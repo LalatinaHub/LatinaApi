@@ -8,7 +8,6 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-co-op/gocron v1.18.0
 	github.com/sagernet/sing-box v1.2.7-0.20230520041538-9ee0f0e74e50
-	github.com/sagernet/sing-dns v0.1.5-0.20230426113254-25d948c44223
 	github.com/sethvargo/go-password v0.2.0
 	github.com/ulule/limiter/v3 v3.11.2
 )
@@ -68,6 +67,7 @@ require (
 	github.com/sagernet/quic-go v0.0.0-20230202071646-a8c8afb18b32 // indirect
 	github.com/sagernet/reality v0.0.0-20230406110435-ee17307e7691 // indirect
 	github.com/sagernet/sing v0.2.5-0.20230517124404-be6013893626 // indirect
+	github.com/sagernet/sing-dns v0.1.5-0.20230426113254-25d948c44223 // indirect
 	github.com/sagernet/sing-mux v0.0.0-20230517134606-1ebe6bb26646 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.2-0.20230509053848-d83f8fe1194c // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.0.0-20230520015001-d3fb9a6fbc61 // indirect
