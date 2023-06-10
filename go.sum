@@ -4,8 +4,8 @@ github.com/Dreamacro/clash v1.16.0 h1:Ve+8mvtsCv7ySa6f53/GOW6Tho0AFp5RNFsgQZFKcZ
 github.com/Dreamacro/clash v1.16.0/go.mod h1:ZM3UI2gqqUN7UL7L/F9aTHODTByya6sbC/WivQpaoJk=
 github.com/Dreamacro/protobytes v0.0.0-20230324064118-87bc784139cd h1:ygk7IF14j4ep4H2ZyeDe3IEoMZF8JdbX851RVVa/4D8=
 github.com/Dreamacro/protobytes v0.0.0-20230324064118-87bc784139cd/go.mod h1:QvmEZ/h6KXszPOr2wUFl7Zn3hfFNYdfbXwPVDTyZs6k=
-github.com/LalatinaHub/sing-box v0.0.0-20230610021002-4becc054a346 h1:6AkexNTZ8xpaQ744KldjKez4zsdPvfssHb/ZCERly2s=
-github.com/LalatinaHub/sing-box v0.0.0-20230610021002-4becc054a346/go.mod h1:ykdrVLXmZ4SIZ2k3CQV4njOG98vGe6/9Qez6fDynENg=
+github.com/LalatinaHub/sing-box v0.0.0-20230610102329-e349d097c3ec h1:migfc96MqzsRnTspMhrqRJ0zDcirceztiJxsg9/b3Zc=
+github.com/LalatinaHub/sing-box v0.0.0-20230610102329-e349d097c3ec/go.mod h1:ykdrVLXmZ4SIZ2k3CQV4njOG98vGe6/9Qez6fDynENg=
 github.com/NicoNex/echotron/v3 v3.25.0 h1:lJ4qOxdS46m9c4ndeT4pnE6uieQl5uFQGQRkT4Yu+qQ=
 github.com/NicoNex/echotron/v3 v3.25.0/go.mod h1:LpP5IyHw0y+DZUZMBgXEDAF9O8feXrQu7w7nlJzzoZI=
 github.com/ajg/form v1.5.1 h1:t9c7v8JUKu/XxOGBU0yjNpaMloxGEJhUkqFRq0ibGeU=
