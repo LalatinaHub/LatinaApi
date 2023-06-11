@@ -28,6 +28,7 @@ type PremiumData struct {
 	VPN      string
 	Domain   string
 	Quota    int
+	CC       string
 }
 
 func CreatePremiumAccount(id int64, vpn, domain string) bool {
@@ -61,9 +62,9 @@ func UpdatePremiumPassword(id int64, domain string) bool {
 
 func GetPremiumAccount(cred any) PremiumData {
 	var (
-		id, pass, vpn, domain sql.NullString
-		quota                 sql.NullInt64
-		query                 string
+		id, pass, vpn, domain, cc sql.NullString
+		quota                     sql.NullInt64
+		query                     string
 	)
 
 	if reflect.TypeOf(cred).Kind() == reflect.String {
@@ -79,7 +80,7 @@ func GetPremiumAccount(cred any) PremiumData {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&id, &pass, &vpn, &domain, &quota)
+		err := rows.Scan(&id, &pass, &vpn, &domain, &quota, &cc)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -91,6 +92,7 @@ func GetPremiumAccount(cred any) PremiumData {
 		VPN:      vpn.String,
 		Domain:   domain.String,
 		Quota:    int(quota.Int64),
+		CC:       cc.String,
 	}
 }
 
