@@ -31,10 +31,10 @@ type PremiumData struct {
 	CC       string
 }
 
-func CreatePremiumAccount(id int64, vpn, domain string) bool {
+func CreatePremiumAccount(id int64, vpn, domain, cc string) bool {
 	var (
 		queries = []string{
-			fmt.Sprintf("INSERT INTO premium (id, type, domain) VALUES(%d, '%s', '%s') ON CONFLICT (id) DO UPDATE SET type = EXCLUDED.type, domain = EXCLUDED.domain", id, vpn, domain),
+			fmt.Sprintf("INSERT INTO premium (id, type, domain, cc) VALUES(%d, '%s', '%s', '%s') ON CONFLICT (id) DO UPDATE SET type = EXCLUDED.type, domain = EXCLUDED.domain, cc = EXCLUDED.cc", id, vpn, domain, cc),
 			fmt.Sprintf("UPDATE domains SET populate = (SELECT COUNT(*) FROM premium WHERE domain = '%s') WHERE domain = '%s'", domain, domain),
 		}
 	)

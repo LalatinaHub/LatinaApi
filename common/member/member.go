@@ -33,9 +33,9 @@ func GetMember(cred any) (int, string) {
 	)
 
 	if reflect.TypeOf(cred).Kind() == reflect.String {
-		query = fmt.Sprintf(`SELECT EXTRACT(DAY FROM NOW() - (SELECT EXPIRED FROM users WHERE PASSWORD = '%s')), PASSWORD FROM users WHERE PASSWORD = '%s'`, cred, cred)
+		query = fmt.Sprintf(`SELECT EXTRACT(DAY FROM NOW() - (SELECT expired FROM users WHERE password = '%s')), password FROM users WHERE password = '%s'`, cred, cred)
 	} else {
-		query = fmt.Sprintf(`SELECT EXTRACT(DAY FROM NOW() - (SELECT EXPIRED FROM users WHERE ID = %d)), PASSWORD FROM users WHERE ID = %d`, cred, cred)
+		query = fmt.Sprintf(`SELECT EXTRACT(DAY FROM NOW() - (SELECT expired FROM users WHERE id = %d)), password FROM users WHERE id = %d`, cred, cred)
 	}
 
 	rows, err := db.New().Conn().Query(query)
