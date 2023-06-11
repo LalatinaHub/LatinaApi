@@ -114,7 +114,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 
 	var (
 		ports      = strings.Split(c.DefaultQuery("port", "80,443"), ",")
-		networks   = strings.Split(c.DefaultQuery("network", "ws,tcp"), ",")
+		networks   = strings.Split(c.DefaultQuery("network", "ws,tcp,grpc"), ",")
 		securities = strings.Split(c.DefaultQuery("tls", "1,0"), ",")
 		modes      = strings.Split(c.DefaultQuery("mode", "cdn,sni"), ",")
 		vpns       = strings.Split(c.DefaultQuery("vpn", "trojan,vmess,vless"), ",")
@@ -134,7 +134,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 							continue
 						} else if network == "ws" && mode == "sni" {
 							continue
-						} else if network == "tcp" && mode == "cdn" {
+						} else if (network == "tcp" || network == "grpc") && mode == "cdn" {
 							continue
 						} else if accountData.VPN != vpn {
 							continue
