@@ -84,26 +84,11 @@ func ToRaw(accounts []db.DBScheme, args ...string) string {
 			u.RawQuery, _ = url.PathUnescape(q.Encode())
 			result = append(result, u.String())
 		case C.TypeShadowsocks:
-			var (
-				rawQuery string = ""
-				obfsMode string = "http"
-			)
-
-			if account.TLS {
-				obfsMode = "tls"
-			}
-
-			switch account.Plugin {
-			default:
-				rawQuery = "plugin=obfs-local;obfs=" + obfsMode + ";obfs-host=" + account.SNI
-			}
-
 			u := url.URL{
 				Scheme:   "ss",
 				Host:     fmt.Sprintf("%s:%d", account.Server, account.ServerPort),
 				User:     url.User(helper.EncodeToBase64(fmt.Sprintf("%s:%s", account.Method, account.Password))),
 				Fragment: account.Remark,
-				RawQuery: rawQuery,
 			}
 
 			result = append(result, u.String())

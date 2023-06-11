@@ -19,7 +19,7 @@ RUN go mod edit -dropreplace="github.com/LalatinaHub/LatinaSub-go"
 RUN go get -v github.com/LalatinaHub/LatinaBot@main
 RUN go get -v github.com/LalatinaHub/LatinaSub-go@main
 RUN go mod download && go mod tidy && go mod verify
-RUN go build -tags with_grpc,with_shadowsocksr -o /usr/local/bin/latinaapi ./cmd/latinaapi/main.go
+RUN go build -tags with_shadowsocksr -o /usr/local/bin/latinaapi ./cmd/latinaapi/main.go
 RUN rm -rf *
 
 FROM golang:latest as main
