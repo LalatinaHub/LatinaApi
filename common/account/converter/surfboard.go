@@ -71,7 +71,7 @@ func ToSurfboard(accounts []db.DBScheme, args ...string) string {
 
 		switch account.Transport {
 		case C.V2RayTransportTypeWebsocket:
-			proxy = fmt.Sprintf("%s,ws=%t,ws-path=%s,ws-headers:Host=%s", proxy, true, account.Path, account.Host)
+			proxy = fmt.Sprintf("%s,ws=%t,ws-path=%s,ws-headers=Host:%s", proxy, true, account.Path, account.Host)
 		}
 
 		proxies = append(proxies, proxy)
