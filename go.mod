@@ -3,7 +3,7 @@ module github.com/LalatinaHub/LatinaApi
 go 1.20
 
 require (
-	github.com/LalatinaHub/LatinaBot v0.0.0-20230615000929-9775f021724e
+	github.com/LalatinaHub/LatinaBot v0.0.0-20230617082431-b996e20673db
 	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230612055535-8af29b3ddfc6
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-co-op/gocron v1.18.0
