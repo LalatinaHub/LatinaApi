@@ -21,10 +21,12 @@ func ToSing(accounts []db.DBScheme, args ...string) option.Options {
 			for _, outbound := range ToBfa(accounts, args...).Outbounds {
 				switch outbound.Type {
 				case C.TypeSelector, C.TypeURLTest:
+					continue
+				case C.TypeDirect, C.TypeBlock, C.TypeDNS:
 				default:
 					selector.SelectorOptions.Outbounds = append(selector.SelectorOptions.Outbounds, outbound.Tag)
-					outbounds = append(outbounds, outbound)
 				}
+				outbounds = append(outbounds, outbound)
 			}
 
 			outbounds = append([]option.Outbound{selector}, outbounds...)
