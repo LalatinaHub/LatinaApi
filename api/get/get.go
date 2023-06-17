@@ -71,6 +71,8 @@ func GetHandler(c *gin.Context) {
 		c.String(http.StatusOK, converter.ToRaw(proxies, args...))
 	case "bfa", "sfa":
 		c.JSON(http.StatusOK, converter.ToBfa(proxies, args...))
+	case "sing":
+		c.JSON(http.StatusOK, converter.ToSing(proxies, args...))
 	default:
 		c.JSON(http.StatusOK, proxies)
 	}
