@@ -35,7 +35,7 @@ func ToSing(accounts []db.DBScheme, args ...string) option.Options {
 				},
 				{
 					Type: C.TypeURLTest,
-					Tag:  "Internet - UrlTest",
+					Tag:  "Internet - URLTest",
 					URLTestOptions: option.URLTestOutboundOptions{
 						Outbounds: proxyTags,
 					},
