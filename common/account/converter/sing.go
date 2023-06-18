@@ -9,14 +9,10 @@ import (
 func ToSing(accounts []db.DBScheme, args ...string) option.Options {
 	options := option.Options{
 		Outbounds: func() []option.Outbound {
-			outbounds := []option.Outbound{}
-			selector := option.Outbound{
-				Type: C.TypeSelector,
-				Tag:  "Internet",
-				SelectorOptions: option.SelectorOutboundOptions{
-					Outbounds: []string{},
-				},
-			}
+			var (
+				proxyTags = []string{}
+				outbounds = []option.Outbound{}
+			)
 
 			for _, outbound := range ToBfa(accounts, args...).Outbounds {
 				switch outbound.Type {
@@ -24,12 +20,29 @@ func ToSing(accounts []db.DBScheme, args ...string) option.Options {
 					continue
 				case C.TypeDirect, C.TypeBlock, C.TypeDNS:
 				default:
-					selector.SelectorOptions.Outbounds = append(selector.SelectorOptions.Outbounds, outbound.Tag)
+					proxyTags = append(proxyTags, outbound.Tag)
 				}
 				outbounds = append(outbounds, outbound)
 			}
 
-			outbounds = append([]option.Outbound{selector}, outbounds...)
+			controller := []option.Outbound{
+				{
+					Type: C.TypeSelector,
+					Tag:  "Internet",
+					SelectorOptions: option.SelectorOutboundOptions{
+						Outbounds: proxyTags,
+					},
+				},
+				{
+					Type: C.TypeURLTest,
+					Tag:  "Internet - UrlTest",
+					URLTestOptions: option.URLTestOutboundOptions{
+						Outbounds: proxyTags,
+					},
+				},
+			}
+
+			outbounds = append(controller, outbounds...)
 			return outbounds
 		}(),
 	}
