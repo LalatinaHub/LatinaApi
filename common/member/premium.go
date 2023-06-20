@@ -115,6 +115,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 	}
 
 	var (
+		countries  = strings.Split(c.DefaultQuery("cc", vpsInfo.CountryCode), ",")
 		ports      = strings.Split(c.DefaultQuery("port", "80,443"), ",")
 		networks   = strings.Split(c.DefaultQuery("network", "ws,tcp"), ",")
 		securities = strings.Split(c.DefaultQuery("tls", "1,0"), ",")
@@ -122,84 +123,90 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 		vpns       = strings.Split(c.DefaultQuery("vpn", "trojan,vmess,vless"), ",")
 	)
 
-	for _, p := range ports {
-		port, _ := strconv.Atoi(p)
-		for _, tls := range securities {
-			for _, network := range networks {
-				for _, mode := range modes {
-					for _, vpn := range vpns {
-						if (network == "tcp" || mode == "sni") && (port == 80 || vpn == "vless") {
-							continue
-						} else if tls == "0" && port == 443 {
-							continue
-						} else if tls == "1" && port == 80 {
-							continue
-						} else if network == "ws" && mode == "sni" {
-							continue
-						} else if network == "tcp" && mode == "cdn" {
-							continue
-						} else if accountData.VPN != vpn {
-							continue
-						} else if accountData.Domain == "" {
-							continue
+	for _, cc := range countries {
+		if cc != vpsInfo.CountryCode {
+			continue
+		}
+
+		for _, p := range ports {
+			port, _ := strconv.Atoi(p)
+			for _, tls := range securities {
+				for _, network := range networks {
+					for _, mode := range modes {
+						for _, vpn := range vpns {
+							if (network == "tcp" || mode == "sni") && (port == 80 || vpn == "vless") {
+								continue
+							} else if tls == "0" && port == 443 {
+								continue
+							} else if tls == "1" && port == 80 {
+								continue
+							} else if network == "ws" && mode == "sni" {
+								continue
+							} else if network == "tcp" && mode == "cdn" {
+								continue
+							} else if accountData.VPN != vpn {
+								continue
+							} else if accountData.Domain == "" {
+								continue
+							}
+
+							var (
+								domain = accountData.Domain
+								tlsstr = "TLS"
+							)
+
+							// switch network {
+							// case "tcp":
+							// default:
+							// 	domain = fmt.Sprintf("%s.%s", network, domain)
+							// }
+
+							if port == 80 || tls == "0" {
+								tlsstr = "NTLS"
+							}
+
+							var relayString string
+							if accountData.CC != vpsInfo.CountryCode && accountData.CC != "" {
+								relayString = fmt.Sprintf("%s <- ", H.CCToEmoji(accountData.CC))
+							}
+							remark := fmt.Sprintf("%d %s%s ✨ %s %s %s %s", len(result)+1, relayString, H.CCToEmoji(vpsInfo.CountryCode), vpsInfo.Org, strings.ToUpper(network), strings.ToUpper(mode), tlsstr)
+
+							d := db.DBScheme{
+								Server:        domain,
+								Ip:            vpsInfo.Ip,
+								ServerPort:    port,
+								Security:      "auto",
+								AlterId:       0,
+								Method:        "",
+								Plugin:        "",
+								Protocol:      "",
+								ProtocolParam: "",
+								OBFS:          "",
+								OBFSParam:     "",
+								Host:          domain,
+								TLS:           tls == "1",
+								Transport:     network,
+								Path:          "/" + vpn,
+								ServiceName:   vpn,
+								Insecure:      true,
+								SNI:           domain,
+								Remark:        remark,
+								ConnMode:      mode,
+								CountryCode:   vpsInfo.CountryCode,
+								Region:        vpsInfo.Region,
+								Org:           vpsInfo.Org,
+								VPN:           vpn,
+							}
+
+							switch vpn {
+							case C.TypeTrojan:
+								d.Password = accountData.Password
+							default:
+								d.UUID = accountData.Password
+							}
+
+							result = append(result, d)
 						}
-
-						var (
-							domain = accountData.Domain
-							tlsstr = "TLS"
-						)
-
-						// switch network {
-						// case "tcp":
-						// default:
-						// 	domain = fmt.Sprintf("%s.%s", network, domain)
-						// }
-
-						if port == 80 || tls == "0" {
-							tlsstr = "NTLS"
-						}
-
-						var relayString string
-						if accountData.CC != vpsInfo.CountryCode && accountData.CC != "" {
-							relayString = fmt.Sprintf("%s <- ", H.CCToEmoji(accountData.CC))
-						}
-						remark := fmt.Sprintf("%d %s%s ✨ %s %s %s %s", len(result)+1, relayString, H.CCToEmoji(vpsInfo.CountryCode), vpsInfo.Org, strings.ToUpper(network), strings.ToUpper(mode), tlsstr)
-
-						d := db.DBScheme{
-							Server:        domain,
-							Ip:            vpsInfo.Ip,
-							ServerPort:    port,
-							Security:      "auto",
-							AlterId:       0,
-							Method:        "",
-							Plugin:        "",
-							Protocol:      "",
-							ProtocolParam: "",
-							OBFS:          "",
-							OBFSParam:     "",
-							Host:          domain,
-							TLS:           tls == "1",
-							Transport:     network,
-							Path:          "/" + vpn,
-							ServiceName:   vpn,
-							Insecure:      true,
-							SNI:           domain,
-							Remark:        remark,
-							ConnMode:      mode,
-							CountryCode:   vpsInfo.CountryCode,
-							Region:        vpsInfo.Region,
-							Org:           vpsInfo.Org,
-							VPN:           vpn,
-						}
-
-						switch vpn {
-						case C.TypeTrojan:
-							d.Password = accountData.Password
-						default:
-							d.UUID = accountData.Password
-						}
-
-						result = append(result, d)
 					}
 				}
 			}

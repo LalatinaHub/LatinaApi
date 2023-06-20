@@ -69,9 +69,11 @@ func ToRaw(accounts []db.DBScheme, args ...string) string {
 
 			// Set queries
 			q := u.Query()
-			if tls != "" {
-				q.Set("security", tls)
+			if tls == "" {
+				tls = "none"
 			}
+
+			q.Set("security", tls)
 			q.Set("type", account.Transport)
 			q.Set("sni", account.SNI)
 			q.Set("allowInsecure", "true")
