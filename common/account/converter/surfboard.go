@@ -8,7 +8,7 @@ import (
 	C "github.com/sagernet/sing-box/constant"
 )
 
-var baseConfig = `#!MANAGED-CONFIG URL_PLACEHOLDER interval=3600 strict=true
+var baseConfig = `#!MANAGED-CONFIG URL_PLACEHOLDER interval=21600 strict=true
 
 [General]
 dns-server = system, 1.1.1.1, 1.0.0.1
