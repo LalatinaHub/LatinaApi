@@ -44,7 +44,6 @@ func CreatePremiumAccount(id int64, vpn, domain, cc string) bool {
 		return false
 	}
 
-	apiHelper.Fetch("https://" + domain + "/" + reload)
 	return true
 }
 
