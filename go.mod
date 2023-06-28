@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/LalatinaHub/LatinaBot v0.0.0-20230628120555-9938b46d14d4
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230628112129-b559497f9299
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230628125535-48ef885399e3
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-co-op/gocron v1.18.0
 	github.com/sagernet/sing-box v1.2.7-0.20230520041538-9ee0f0e74e50

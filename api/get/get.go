@@ -69,12 +69,26 @@ func GetHandler(c *gin.Context) {
 		proxyPool[rawProxy] = proxy
 	}
 
-	proxies = []db.DBScheme{}
 	_, nodes := latinasub.Start(rawProxies, false)
+	proxies = []db.DBScheme{}
+	rawProxies = []string{}
 	for _, node := range nodes {
 		for keyNode, proxy := range proxyPool {
 			if node.Link == keyNode {
-				proxies = append(proxies, proxy)
+				isExists := func() bool {
+					for _, node := range rawProxies {
+						if node == keyNode {
+							return true
+						}
+					}
+					return false
+				}()
+
+				if !isExists {
+					proxies = append(proxies, proxy)
+					rawProxies = append(rawProxies, keyNode)
+				}
+				break
 			}
 		}
 	}
