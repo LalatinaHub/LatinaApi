@@ -9,6 +9,7 @@ import (
 	"github.com/LalatinaHub/LatinaApi/common/account/converter"
 	"github.com/LalatinaHub/LatinaApi/common/helper"
 	"github.com/LalatinaHub/LatinaApi/common/member"
+	latinasub "github.com/LalatinaHub/LatinaSub-go"
 	"github.com/LalatinaHub/LatinaSub-go/db"
 	"github.com/gin-gonic/gin"
 )
@@ -58,6 +59,25 @@ func GetHandler(c *gin.Context) {
 
 	// Populate bugs
 	proxies = account.PopulateBugs(proxies, cdn, sni)
+
+	// Test proxies
+	proxyPool := map[string]db.DBScheme{}
+	rawProxies := []string{}
+	for _, proxy := range proxies {
+		rawProxy := converter.ToRaw([]db.DBScheme{proxy})
+		rawProxies = append(rawProxies, rawProxy)
+		proxyPool[rawProxy] = proxy
+	}
+
+	proxies = []db.DBScheme{}
+	_, nodes := latinasub.Start(rawProxies, false)
+	for _, node := range nodes {
+		for keyNode, proxy := range proxyPool {
+			if node.Link == keyNode {
+				proxies = append(proxies, proxy)
+			}
+		}
+	}
 
 	// Set headers and filters
 	c.Header("Content-Disposition", disposition)

@@ -38,7 +38,7 @@ func cronJob() {
 		if len(nodes) > 100 {
 			fmt.Println("Filtering accounts ...")
 			helper.LogFuncToFile(func() {
-				latinasub.Start(nodes)
+				latinasub.Start(nodes, true)
 			}, "scrape.log")
 		} else {
 			fmt.Println("No accounts found!")
@@ -49,7 +49,7 @@ func cronJob() {
 	schedule.Every(1).Day().At("09:00").Tag("scrape").Do(func() {
 		fmt.Println("Scraping accounts ...")
 		helper.LogFuncToFile(func() {
-			latinasub.Start([]string{})
+			latinasub.Start([]string{}, true)
 		}, "scrape.log")
 	})
 
@@ -76,8 +76,6 @@ func cronJob() {
 	schedule.StartAsync()
 	// schedule.RunByTag("scrape")
 }
-
-
 
 func main() {
 
