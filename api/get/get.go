@@ -10,7 +10,7 @@ import (
 	"github.com/LalatinaHub/LatinaApi/common/helper"
 	"github.com/LalatinaHub/LatinaApi/common/member"
 
-	// latinasub "github.com/LalatinaHub/LatinaSub-go"
+	latinasub "github.com/LalatinaHub/LatinaSub-go"
 	"github.com/LalatinaHub/LatinaSub-go/db"
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +20,7 @@ func GetHandler(c *gin.Context) {
 		proxies  []db.DBScheme
 		format   = c.Query("format")
 		password = c.Query("pass")
+		extreme  = c.Query("extreme")
 		cdn      = strings.Split(c.DefaultQuery("cdn", ""), ",")
 		sni      = strings.Split(c.DefaultQuery("sni", ""), ",")
 		args     = strings.Split(c.DefaultQuery("arg", ""), ",")
@@ -62,37 +63,39 @@ func GetHandler(c *gin.Context) {
 	proxies = account.PopulateBugs(proxies, cdn, sni)
 
 	// Test proxies
-	// proxyPool := map[string]db.DBScheme{}
-	// rawProxies := []string{}
-	// for _, proxy := range proxies {
-	// 	rawProxy := converter.ToRaw([]db.DBScheme{proxy})
-	// 	rawProxies = append(rawProxies, rawProxy)
-	// 	proxyPool[rawProxy] = proxy
-	// }
+	if extreme == "1" {
+		proxyPool := map[string]db.DBScheme{}
+		rawProxies := []string{}
+		for _, proxy := range proxies {
+			rawProxy := converter.ToRaw([]db.DBScheme{proxy})
+			rawProxies = append(rawProxies, rawProxy)
+			proxyPool[rawProxy] = proxy
+		}
 
-	// _, nodes := latinasub.Start(rawProxies, false)
-	// proxies = []db.DBScheme{}
-	// rawProxies = []string{}
-	// for _, node := range nodes {
-	// 	for keyNode, proxy := range proxyPool {
-	// 		if node.Link == keyNode {
-	// 			isExists := func() bool {
-	// 				for _, node := range rawProxies {
-	// 					if node == keyNode {
-	// 						return true
-	// 					}
-	// 				}
-	// 				return false
-	// 			}()
+		_, nodes := latinasub.Start(rawProxies, false)
+		proxies = []db.DBScheme{}
+		rawProxies = []string{}
+		for _, node := range nodes {
+			for keyNode, proxy := range proxyPool {
+				if node.Link == keyNode {
+					isExists := func() bool {
+						for _, node := range rawProxies {
+							if node == keyNode {
+								return true
+							}
+						}
+						return false
+					}()
 
-	// 			if !isExists {
-	// 				proxies = append(proxies, proxy)
-	// 				rawProxies = append(rawProxies, keyNode)
-	// 			}
-	// 			break
-	// 		}
-	// 	}
-	// }
+					if !isExists {
+						proxies = append(proxies, proxy)
+						rawProxies = append(rawProxies, keyNode)
+					}
+					break
+				}
+			}
+		}
+	}
 
 	// Set headers and filters
 	c.Header("Content-Disposition", disposition)
