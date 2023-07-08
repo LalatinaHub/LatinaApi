@@ -27,7 +27,7 @@ func GetHandler(c *gin.Context) {
 	)
 
 	// Build headers and filters
-	disposition := "filename=FUCKMETILLDAYLIGHT"
+	disposition := "filename=FUCKMETILLTHEDAYLIGHT"
 	filter := helper.BuildFilter(c)
 
 	// Authenticate user
