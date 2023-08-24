@@ -6,7 +6,7 @@ RUN git clone https://github.com/LalatinaHub/LatinaDocs .
 RUN npm install
 RUN npm run build
 
-FROM golang:latest as api
+FROM golang:1.20.7 as api
 
 WORKDIR /usr/src/api
 
@@ -22,7 +22,7 @@ RUN go mod download && go mod tidy && go mod verify
 RUN go build -tags with_shadowsocksr -o /usr/local/bin/latinaapi ./cmd/latinaapi/main.go
 RUN rm -rf *
 
-FROM golang:latest as main
+FROM golang:1.20.7 as main
 
 WORKDIR /usr/src/app
 
