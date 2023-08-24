@@ -32,7 +32,7 @@ func GetHandler(c *gin.Context) {
 
 	// Authenticate user
 	if filter == "" || password == "" {
-		c.String(http.StatusUnauthorized, "Password invalid / not provided !")
+		c.String(http.StatusUnauthorized, "Password invalid / not provided, get one from foolvpn.t.me !")
 		return
 	}
 
