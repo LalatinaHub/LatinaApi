@@ -5,8 +5,8 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	github.com/LalatinaHub/LatinaBot v0.0.0-20230826002308-a5dc308a6b74
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230826000836-1a961083f8e8
+	github.com/LalatinaHub/LatinaBot v0.0.0-20230826004559-f8a33876fd74
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230826004229-80a33a5abb43
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.32.1
 	github.com/sagernet/sing-box v1.4.0-rc.3
