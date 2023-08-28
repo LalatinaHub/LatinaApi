@@ -9,6 +9,7 @@ import (
 	logRoute "github.com/LalatinaHub/LatinaApi/api/log"
 	"github.com/LalatinaHub/LatinaApi/api/middleware"
 	parseRoute "github.com/LalatinaHub/LatinaApi/api/parse"
+	subfinderRoute "github.com/LalatinaHub/LatinaApi/api/subfinder"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
@@ -34,6 +35,7 @@ func Start() {
 	Router.GET("/get", getRoute.GetHandler)
 	Router.GET("/log", logRoute.LogHandler)
 	Router.POST("/parse", parseRoute.ParseHandler)
+	Router.GET("/subfinder", subfinderRoute.SubfinderHandler)
 
 	if Port == "" {
 		Port = "8080"
