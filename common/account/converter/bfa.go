@@ -76,6 +76,24 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		options.UnmarshalJSON([]byte(buf.String()))
 	}
 
+	for i, dnsRule := range options.DNS.Rules {
+		rule := dnsRule.DefaultOptions
+
+		if rule.Server == "direct-dns" {
+			if rule.Outbound != nil || rule.Geosite != nil || rule.DomainSuffix != nil || rule.Network != nil {
+				continue
+			}
+		} else {
+			continue
+		}
+
+		if i+1 == len(options.DNS.Rules) {
+			options.DNS.Rules = options.DNS.Rules[:i]
+		} else {
+			options.DNS.Rules = append(options.DNS.Rules[:i], options.DNS.Rules[i+1:]...)
+		}
+	}
+
 	options.Outbounds = append(options.Outbounds, outbounds...)
 	for i, outbound := range options.Outbounds {
 		switch outbound.Tag {
@@ -86,8 +104,8 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		}
 	}
 
-	options.Route.GeoIP.DownloadURL = ""
-	options.Route.Geosite.DownloadURL = ""
+	// options.Route.GeoIP.DownloadURL = ""
+	// options.Route.Geosite.DownloadURL = ""
 	options.Experimental.ClashAPI.Secret = ""
 
 	return options
