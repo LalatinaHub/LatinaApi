@@ -6,7 +6,7 @@ toolchain go1.21.0
 
 require (
 	github.com/LalatinaHub/LatinaBot v0.0.0-20230826004559-f8a33876fd74
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230904125908-95b79ff950a5
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230913093842-a3bec161e38f
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.32.1
 	github.com/projectdiscovery/subfinder/v2 v2.6.2
