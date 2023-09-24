@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -12,17 +10,13 @@ import (
 	"github.com/LalatinaHub/LatinaApi/common/account"
 	"github.com/LalatinaHub/LatinaApi/common/account/converter"
 	"github.com/LalatinaHub/LatinaApi/common/helper"
-	latinabot "github.com/LalatinaHub/LatinaBot"
 	latinasub "github.com/LalatinaHub/LatinaSub-go"
 	"github.com/go-co-op/gocron"
 )
 
 var (
-	filterCron    = os.Getenv("FILTER_CRON")
-	loc, _        = time.LoadLocation("Asia/Jakarta")
-	botToken      = os.Getenv("BOT_TOKEN")
-	chatID        = os.Getenv("CHAT_ID")
-	sampleTopicID = os.Getenv("SAMPLE_TOPIC_ID")
+	filterCron = os.Getenv("FILTER_CRON")
+	loc, _     = time.LoadLocation("Asia/Jakarta")
 )
 
 func cronJob() {
@@ -52,26 +46,6 @@ func cronJob() {
 			latinasub.Start([]string{}, true)
 		}, "scrape.log")
 	})
-
-	// Telegram bot
-	if botToken != "" {
-		fmt.Println("Starting telegram bot ...")
-		go latinabot.Start()
-
-		if chatID != "" {
-			var (
-				intChatID, _        = strconv.Atoi(chatID)
-				intSampleTopicID, _ = strconv.Atoi(sampleTopicID)
-			)
-
-			if intSampleTopicID > 0 {
-				schedule.Every(3).Hour().Do(func() {
-					log.Println("Send VPN sample to channel ...")
-					go latinabot.SendVPNToTopic(int64(intChatID), intSampleTopicID)
-				})
-			}
-		}
-	}
 
 	schedule.StartAsync()
 	// schedule.RunByTag("scrape")

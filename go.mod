@@ -5,20 +5,15 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	github.com/LalatinaHub/LatinaBot v0.0.0-20230826004559-f8a33876fd74
 	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230913093842-a3bec161e38f
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.32.1
 	github.com/projectdiscovery/subfinder/v2 v2.6.2
 	github.com/sagernet/sing-box v1.5.0-beta.2.0.20230903131325-dc985ed99dd9
-	github.com/sethvargo/go-password v0.2.0
 	github.com/ulule/limiter/v3 v3.11.2
 )
 
-replace (
-	github.com/LalatinaHub/LatinaBot => ../LatinaBot
-	github.com/LalatinaHub/LatinaSub-go => ../LatinaSub-go
-)
+replace github.com/LalatinaHub/LatinaSub-go => ../LatinaSub-go
 
 require (
 	aead.dev/minisign v0.2.0 // indirect
@@ -27,7 +22,6 @@ require (
 	github.com/Dreamacro/protobytes v0.0.0-20230617041236-6500a9f4f158 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Mzack9999/go-http-digest-auth-client v0.6.1-0.20220414142836-eb8883508809 // indirect
-	github.com/NicoNex/echotron/v3 v3.26.0 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect

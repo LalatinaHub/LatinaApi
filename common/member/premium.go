@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -18,10 +17,6 @@ import (
 	C "github.com/sagernet/sing-box/constant"
 )
 
-var (
-	reload = os.Getenv("PASSWORD")
-)
-
 type PremiumData struct {
 	Id       string
 	Password string
@@ -29,34 +24,6 @@ type PremiumData struct {
 	Domain   string
 	Quota    int
 	CC       string
-}
-
-func CreatePremiumAccount(id int64, vpn, domain, cc string) bool {
-	var (
-		queries = []string{
-			fmt.Sprintf("INSERT INTO premium (id, type, domain, cc) VALUES(%d, '%s', '%s', '%s') ON CONFLICT (id) DO UPDATE SET type = EXCLUDED.type, domain = EXCLUDED.domain, cc = EXCLUDED.cc", id, vpn, domain, cc),
-			fmt.Sprintf("UPDATE domains SET populate = (SELECT COUNT(*) FROM premium WHERE domain = '%s') WHERE domain = '%s'", domain, domain),
-		}
-	)
-
-	_, err := db.New().Conn().Exec(fmt.Sprintf("BEGIN; %s; COMMIT;", strings.Join(queries[:], ";")))
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
-func UpdatePremiumPassword(id int64, domain string) bool {
-	query := fmt.Sprintf("UPDATE premium SET password = default WHERE id = %d", id)
-
-	_, err := db.New().Conn().Exec(query)
-	if err != nil {
-		return false
-	}
-
-	apiHelper.Fetch("https://" + domain + "/" + reload)
-	return true
 }
 
 func GetPremiumAccount(cred any) PremiumData {
@@ -138,8 +105,6 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 							} else if tls == "0" && port == 443 {
 								continue
 							} else if tls == "1" && port == 80 {
-								continue
-							} else if network == "ws" && mode == "sni" {
 								continue
 							} else if network == "tcp" && mode == "cdn" {
 								continue
