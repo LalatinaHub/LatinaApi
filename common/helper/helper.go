@@ -53,7 +53,7 @@ func BuildFilter(c *gin.Context) string {
 			for key, value := range c.Request.URL.Query() {
 				switch key {
 				case "vpn":
-					queries = append(queries, "vpn=vmess")
+					queries = append(queries, "vpn=vmess,vless,trojan")
 				case "region":
 					queries = append(queries, "region=Asia")
 				case "cc":
@@ -79,7 +79,7 @@ func BuildFilter(c *gin.Context) string {
 				queries = append(queries, "cc=SG,ID")
 			}
 			if c.Query("vpn") == "" {
-				queries = append(queries, "vpn=vmess")
+				queries = append(queries, "vpn=vmess,vless,trojan")
 			}
 
 			c.Request.URL.RawQuery = strings.Join(queries[:], "&")
