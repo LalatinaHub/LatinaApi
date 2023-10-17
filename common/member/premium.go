@@ -24,6 +24,7 @@ type PremiumData struct {
 	Domain   string
 	Quota    int
 	CC       string
+	Adblock  bool
 }
 
 func GetPremiumAccount(cred any) PremiumData {
@@ -31,6 +32,7 @@ func GetPremiumAccount(cred any) PremiumData {
 		id, pass, vpn, domain, cc sql.NullString
 		quota                     sql.NullInt64
 		query                     string
+		adblock                   sql.NullBool
 	)
 
 	if reflect.TypeOf(cred).Kind() == reflect.String {
@@ -46,7 +48,7 @@ func GetPremiumAccount(cred any) PremiumData {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&id, &pass, &vpn, &domain, &quota, &cc)
+		err := rows.Scan(&id, &pass, &vpn, &domain, &quota, &cc, &adblock)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -59,6 +61,7 @@ func GetPremiumAccount(cred any) PremiumData {
 		Domain:   domain.String,
 		Quota:    int(quota.Int64),
 		CC:       cc.String,
+		Adblock:  adblock.Bool,
 	}
 }
 
