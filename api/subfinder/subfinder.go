@@ -21,19 +21,34 @@ type ResultObject struct {
 
 func SubfinderHandler(c *gin.Context) {
 	var (
-		domain = c.Query("domain")
-		result = []ResultObject{}
+		domain    = c.Query("domain")
+		all       = c.Query("all")
+		ip        = c.Query("ip")
+		recursive = c.Query("recursive")
+		result    = []ResultObject{}
 	)
 
 	subfinderOpts := &runner.Options{
 		Threads:            10,
 		Timeout:            30,
 		MaxEnumerationTime: 10,
-		All:                true,
-		HostIP:             true,
-		RemoveWildcard:     true,
+		All:                false,
+		HostIP:             false,
+		RemoveWildcard:     false,
 		OnlyRecursive:      false,
 		JSON:               true,
+	}
+
+	// Options by Query
+	if all == "1" {
+		subfinderOpts.All = true
+	}
+	if ip == "1" {
+		subfinderOpts.HostIP = true
+		subfinderOpts.RemoveWildcard = true
+	}
+	if recursive == "1" {
+		subfinderOpts.OnlyRecursive = true
 	}
 
 	subfinder, err := runner.NewRunner(subfinderOpts)
