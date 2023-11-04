@@ -3,6 +3,7 @@ package subfinder
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,20 +13,42 @@ import (
 	"github.com/projectdiscovery/subfinder/v2/pkg/runner"
 )
 
-type ScanResult struct {
-	Domains []string `json:"domains"`
+type ResultObject struct {
+	Host   string `json:"host"`
+	Ip     string `json:"ip"`
+	Source string `json:"source"`
 }
 
 func SubfinderHandler(c *gin.Context) {
 	var (
-		domain = c.Query("domain")
-		result = ScanResult{}
+		domain    = c.Query("domain")
+		all       = c.Query("all")
+		ip        = c.Query("ip")
+		recursive = c.Query("recursive")
+		result    = []ResultObject{}
 	)
 
 	subfinderOpts := &runner.Options{
 		Threads:            10,
 		Timeout:            30,
 		MaxEnumerationTime: 10,
+		All:                false,
+		HostIP:             false,
+		RemoveWildcard:     false,
+		OnlyRecursive:      false,
+		JSON:               true,
+	}
+
+	// Options by Query
+	if all == "1" {
+		subfinderOpts.All = true
+	}
+	if ip == "1" {
+		subfinderOpts.HostIP = true
+		subfinderOpts.RemoveWildcard = true
+	}
+	if recursive == "1" {
+		subfinderOpts.OnlyRecursive = true
 	}
 
 	subfinder, err := runner.NewRunner(subfinderOpts)
@@ -46,10 +69,15 @@ func SubfinderHandler(c *gin.Context) {
 		return
 	}
 
-	for _, sub := range strings.Split(output.String(), "\n") {
-		if sub != "" {
-			result.Domains = append(result.Domains, sub)
+	objs := output.String()
+	for _, obj := range strings.Split(objs, "\n") {
+		if obj == "" {
+			continue
 		}
+
+		var m ResultObject
+		json.Unmarshal([]byte(obj), &m)
+		result = append(result, m)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
