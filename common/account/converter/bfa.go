@@ -18,7 +18,6 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		tfo, xudp  bool = false, false
 		tags       []string
 		outbounds  []option.Outbound
-		mux        *option.MultiplexOptions
 	)
 
 	for _, arg := range args {
@@ -27,12 +26,6 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 			tfo = true
 		case "xudp":
 			xudp = true
-		case "mux":
-			mux = &option.MultiplexOptions{
-				Enabled:    true,
-				Protocol:   "smux",
-				MaxStreams: 32,
-			}
 		}
 	}
 
@@ -42,17 +35,14 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		switch outbound.Type {
 		case C.TypeVMess:
 			outbound.VMessOptions.TCPFastOpen = tfo
-			outbound.VMessOptions.Multiplex = mux
 			if xudp {
 				outbound.VMessOptions.PacketEncoding = "xudp"
 			}
 		case C.TypeTrojan:
-			outbound.TrojanOptions.Multiplex = mux
 		case C.TypeVLESS:
 			outbound.VLESSOptions.TCPFastOpen = tfo
 		case C.TypeShadowsocks:
 			outbound.ShadowsocksOptions.TCPFastOpen = tfo
-			outbound.ShadowsocksOptions.MultiplexOptions = mux
 		}
 
 		outbounds = append(outbounds, outbound)
