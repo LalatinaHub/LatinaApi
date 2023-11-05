@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -96,21 +95,6 @@ func ToRaw(accounts []db.DBScheme, args ...string) string {
 			}
 
 			result = append(result, u.String())
-		case C.TypeShadowsocksR:
-			var (
-				obfsMode string = "http"
-				base     string = fmt.Sprintf("%s:%d:%s:%s:%s:%s", account.Server, account.ServerPort, account.Protocol, account.Method, account.OBFS, helper.EncodeToBase64(account.Password))
-			)
-
-			if m, _ := regexp.MatchString("tls", account.OBFS); m {
-				obfsMode = "tls"
-			}
-
-			obfsParam := "obfsparam=" + helper.EncodeToBase64("obfs="+obfsMode+";obfs-host="+account.SNI)
-			protoParam := "protoparam=" + helper.EncodeToBase64(account.ProtocolParam)
-			remarks := "remarks=" + helper.EncodeToBase64(account.Remark)
-
-			result = append(result, "ssr://"+helper.EncodeToBase64(base+"/?"+obfsParam+"&"+protoParam+"&"+remarks))
 		}
 	}
 
