@@ -13,7 +13,6 @@ WORKDIR /usr/src/api
 COPY . .
 
 # Drop replace
-RUN go mod edit -dropreplace="github.com/LalatinaHub/LatinaBot"
 RUN go mod edit -dropreplace="github.com/LalatinaHub/LatinaSub-go"
 
 RUN go get -v github.com/LalatinaHub/LatinaBot@main

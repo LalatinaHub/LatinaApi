@@ -5,11 +5,10 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20230913093842-a3bec161e38f
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20231110140930-1d93001261ce
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-co-op/gocron v1.32.1
 	github.com/projectdiscovery/subfinder/v2 v2.6.2
-	github.com/sagernet/sing-box v1.7.0-alpha.5
+	github.com/sagernet/sing-box v1.7.0-alpha.11
 	github.com/ulule/limiter/v3 v3.11.2
 )
 
@@ -59,7 +58,6 @@ require (
 	github.com/google/go-github/v30 v30.1.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/pprof v0.0.0-20230821062121-407c9e7a662f // indirect
-	github.com/google/uuid v1.3.1 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
@@ -115,14 +113,14 @@ require (
 	github.com/sagernet/netlink v0.0.0-20220905062125-8043b4a9aa97 // indirect
 	github.com/sagernet/quic-go v0.0.0-20231008035953-32727fef9460 // indirect
 	github.com/sagernet/reality v0.0.0-20230406110435-ee17307e7691 // indirect
-	github.com/sagernet/sing v0.2.16-0.20231028125948-afcc9cb766c2 // indirect
+	github.com/sagernet/sing v0.2.18-0.20231108041402-4fbbd193203c // indirect
 	github.com/sagernet/sing-dns v0.1.10 // indirect
-	github.com/sagernet/sing-mux v0.1.4-0.20231102172319-a36b95857a9b // indirect
-	github.com/sagernet/sing-quic v0.1.3-0.20231026034240-fa3d997246b6 // indirect
+	github.com/sagernet/sing-mux v0.1.5-0.20231109075101-6b086ed6bb07 // indirect
+	github.com/sagernet/sing-quic v0.1.3 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.5 // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.1.4 // indirect
 	github.com/sagernet/sing-shadowtls v0.1.4 // indirect
-	github.com/sagernet/sing-tun v0.1.17-0.20231103103951-3540ea7680d8 // indirect
+	github.com/sagernet/sing-tun v0.1.20-0.20231107141025-be3aecff893d // indirect
 	github.com/sagernet/sing-vmess v0.1.8 // indirect
 	github.com/sagernet/smux v0.0.0-20230312102458-337ec2a5af37 // indirect
 	github.com/sagernet/tfo-go v0.0.0-20230816093905-5a5c285d44a6 // indirect
@@ -155,7 +153,6 @@ require (
 	github.com/zmap/rc2 v0.0.0-20190804163417-abaa70531248 // indirect
 	github.com/zmap/zcrypto v0.0.0-20230422215203-9a665e1e9968 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	go4.org/netipx v0.0.0-20230824141953-6213f710f925 // indirect
@@ -186,11 +183,10 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/net v0.18.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 )

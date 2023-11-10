@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/LalatinaHub/LatinaSub-go/account"
+	"github.com/LalatinaHub/LatinaSub-go/provider"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +26,11 @@ func ParseHandler(c *gin.Context) {
 	}
 
 	for _, url := range strings.Split(data.Urls, ",") {
-		accounts = append(accounts, *account.New(url))
+		outbounds, err := provider.Parse(url)
+
+		if err == nil && len(outbounds) > 0 {
+			accounts = append(accounts, *account.New(outbounds[0]))
+		}
 	}
 
 	if _, err := json.Marshal(accounts); err != nil {

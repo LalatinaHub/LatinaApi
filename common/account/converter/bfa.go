@@ -6,43 +6,22 @@ import (
 	"strings"
 
 	apiHelper "github.com/LalatinaHub/LatinaApi/api/helper"
-	"github.com/LalatinaHub/LatinaSub-go/account"
 	"github.com/LalatinaHub/LatinaSub-go/db"
-	C "github.com/sagernet/sing-box/constant"
+	"github.com/LalatinaHub/LatinaSub-go/provider"
 	"github.com/sagernet/sing-box/option"
 )
 
 func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 	var (
-		baseConfig      = "https://raw.githubusercontent.com/iyarivky/sing-ribet/main/config/config.json"
-		tfo, xudp  bool = false, false
+		baseConfig = "https://raw.githubusercontent.com/iyarivky/sing-ribet/main/config/config.json"
 		tags       []string
 		outbounds  []option.Outbound
 	)
 
-	for _, arg := range args {
-		switch arg {
-		case "tfo":
-			tfo = true
-		case "xudp":
-			xudp = true
-		}
-	}
-
 	for _, proxy := range strings.Split(ToRaw(accounts, args...), "\n") {
-		outbound := account.New(proxy).Outbound
-
-		switch outbound.Type {
-		case C.TypeVMess:
-			outbound.VMessOptions.TCPFastOpen = tfo
-			if xudp {
-				outbound.VMessOptions.PacketEncoding = "xudp"
-			}
-		case C.TypeTrojan:
-		case C.TypeVLESS:
-			outbound.VLESSOptions.TCPFastOpen = tfo
-		case C.TypeShadowsocks:
-			outbound.ShadowsocksOptions.TCPFastOpen = tfo
+		var outbound option.Outbound
+		if outbounds, err := provider.Parse(proxy); err == nil && len(outbounds) > 0 {
+			outbound = outbounds[0]
 		}
 
 		outbounds = append(outbounds, outbound)
