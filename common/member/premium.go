@@ -86,7 +86,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 	var (
 		countries  = strings.Split(c.DefaultQuery("cc", vpsInfo.CountryCode), ",")
 		ports      = strings.Split(c.DefaultQuery("port", "80,443"), ",")
-		networks   = strings.Split(c.DefaultQuery("network", "ws,tcp"), ",")
+		networks   = strings.Split(c.DefaultQuery("network", "ws,tcp,grpc"), ",")
 		securities = strings.Split(c.DefaultQuery("tls", "1,0"), ",")
 		modes      = strings.Split(c.DefaultQuery("mode", "cdn,sni"), ",")
 		vpns       = strings.Split(c.DefaultQuery("vpn", "trojan,vmess,vless"), ",")
@@ -105,11 +105,11 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 						for _, vpn := range vpns {
 							if (network == "tcp" || mode == "sni") && (port == 80 || vpn == "vless") {
 								continue
-							} else if tls == "0" && port == 443 {
+							} else if (tls == "0" && port == 443) || (tls == "1" && port == 80) {
 								continue
-							} else if tls == "1" && port == 80 {
+							} else if (network == "tcp" || network == "grpc") && mode == "cdn" {
 								continue
-							} else if network == "tcp" && mode == "cdn" {
+							} else if network == "grpc" && port == 80 {
 								continue
 							} else if accountData.VPN != vpn {
 								continue
@@ -121,12 +121,6 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 								domain = accountData.Domain
 								tlsstr = "TLS"
 							)
-
-							// switch network {
-							// case "tcp":
-							// default:
-							// 	domain = fmt.Sprintf("%s.%s", network, domain)
-							// }
 
 							if port == 80 || tls == "0" {
 								tlsstr = "NTLS"
