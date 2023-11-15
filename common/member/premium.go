@@ -14,7 +14,6 @@ import (
 	H "github.com/LalatinaHub/LatinaSub-go/helper"
 	"github.com/LalatinaHub/LatinaSub-go/ipapi"
 	"github.com/gin-gonic/gin"
-	C "github.com/sagernet/sing-box/constant"
 )
 
 type PremiumData struct {
@@ -103,13 +102,15 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 				for _, network := range networks {
 					for _, mode := range modes {
 						for _, vpn := range vpns {
-							if (network == "tcp" || mode == "sni") && (port == 80 || vpn == "vless") {
+							if (network == "tcp" || mode == "sni") && (port == 80) {
 								continue
 							} else if (tls == "0" && port == 443) || (tls == "1" && port == 80) {
 								continue
 							} else if (network == "tcp" || network == "grpc") && mode == "cdn" {
 								continue
 							} else if network == "grpc" && port == 80 {
+								continue
+							} else if vpn == "vless" && network == "tcp" {
 								continue
 							} else if accountData.VPN != vpn {
 								continue
@@ -136,6 +137,8 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 								Server:        domain,
 								Ip:            vpsInfo.Ip,
 								ServerPort:    port,
+								Password:      accountData.Password,
+								UUID:          accountData.Password,
 								Security:      "auto",
 								AlterId:       0,
 								Method:        "",
@@ -157,13 +160,6 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 								Region:        vpsInfo.Region,
 								Org:           vpsInfo.Org,
 								VPN:           vpn,
-							}
-
-							switch vpn {
-							case C.TypeTrojan:
-								d.Password = accountData.Password
-							default:
-								d.UUID = accountData.Password
 							}
 
 							result = append(result, d)
