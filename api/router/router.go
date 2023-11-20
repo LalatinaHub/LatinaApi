@@ -17,19 +17,20 @@ import (
 var (
 	Router = gin.Default()
 	Port   = os.Getenv("PORT")
+	Public = "web/public/"
 )
 
 func Start() {
 	Router.SetTrustedProxies(nil)
 
 	Router.NoRoute(func(c *gin.Context) {
-		html, _ := os.ReadFile("public/404.html")
+		html, _ := os.ReadFile(fmt.Sprintf("%s404.html", Public))
 
 		c.Writer.Header().Set("Content-Type", "text/html")
 		c.String(http.StatusNotFound, string(html))
 	})
 
-	Router.Use(static.Serve("/", static.LocalFile("public/", false)))
+	Router.Use(static.Serve("/", static.LocalFile(Public, false)))
 	Router.Use(middleware.RateLimiter())
 
 	Router.GET("/get", getRoute.GetHandler)
