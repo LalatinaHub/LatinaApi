@@ -5,7 +5,10 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Install dependencies
-RUN go install -tags extended github.com/gohugoio/hugo@latest
+RUN curl -Lo hugo.tar.gz "https://github.com/gohugoio/hugo/releases/download/v0.120.4/hugo_extended_0.120.4_linux-amd64.tar.gz"
+RUN tar -C /usr/local/go/bin -xzf hugo.tar.gz
+RUN rm -rf hugo.tar.gz
+RUN chmod +x /usr/local/go/bin/hugo
 
 # Update submodules
 RUN git submodule update --init --recursive
