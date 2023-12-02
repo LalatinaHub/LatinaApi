@@ -20,17 +20,18 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 	)
 
 	for _, proxy := range strings.Split(ToRaw(accounts, args...), "\n") {
-		var outbound option.Outbound
 		if outbounds, err := provider.Parse(proxy); err == nil && len(outbounds) > 0 {
-			if _, err := json.Marshal(outbounds[0]); err != nil {
-				outbound = outbounds[0]
-			} else {
-				fmt.Println("Error parsing:", proxy)
+			for _, outbound := range outbounds {
+				if _, err := json.Marshal(outbound); err != nil {
+					fmt.Println("Error Provider:", err.Error())
+					fmt.Println("Error Parsing:", proxy)
+				} else {
+					outbounds = append(outbounds, outbound)
+					tags = append(tags, outbound.Tag)
+				}
 			}
 		}
 
-		outbounds = append(outbounds, outbound)
-		tags = append(tags, outbound.Tag)
 	}
 
 	var (
