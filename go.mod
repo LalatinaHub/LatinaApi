@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20231114004531-2d6b37236234
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20231214093319-c29374a17347
 	github.com/gin-gonic/gin v1.9.1
 	github.com/otiai10/gosseract/v2 v2.4.1
 	github.com/projectdiscovery/subfinder/v2 v2.6.2
