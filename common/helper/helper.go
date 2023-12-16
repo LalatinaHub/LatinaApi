@@ -12,7 +12,7 @@ import (
 )
 
 func EncodeToBase64(text string) string {
-	return strings.TrimSuffix(base64.StdEncoding.EncodeToString([]byte(text)), "=")
+	return base64.StdEncoding.EncodeToString([]byte(text))
 }
 
 func GetLastLog() string {
