@@ -11,8 +11,8 @@ import (
 
 	apiHelper "github.com/LalatinaHub/LatinaApi/api/helper"
 	"github.com/LalatinaHub/LatinaSub-go/db"
+	"github.com/LalatinaHub/LatinaSub-go/geoip"
 	H "github.com/LalatinaHub/LatinaSub-go/helper"
-	"github.com/LalatinaHub/LatinaSub-go/ipapi"
 	"github.com/gin-gonic/gin"
 )
 
@@ -68,7 +68,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 	var (
 		result  []db.DBScheme
 		buf     = new(strings.Builder)
-		vpsInfo ipapi.Ipapi
+		vpsInfo geoip.GeoIpJson
 	)
 
 	resp, err := apiHelper.Fetch("https://" + accountData.Domain + "/info")

@@ -5,9 +5,8 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20231214093319-c29374a17347
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20231218123848-5445b35129b7
 	github.com/gin-gonic/gin v1.9.1
-	github.com/otiai10/gosseract/v2 v2.4.1
 	github.com/projectdiscovery/subfinder/v2 v2.6.2
 	github.com/sagernet/sing-box v1.7.0-alpha.11
 	github.com/ulule/limiter/v3 v3.11.2
@@ -85,7 +84,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/onsi/ginkgo/v2 v2.12.0 // indirect
 	github.com/ooni/go-libtor v1.1.8 // indirect
-	github.com/oschwald/maxminddb-golang v1.12.0 // indirect
+	github.com/oschwald/maxminddb-golang v1.12.1-0.20231214003556-410052e7abac // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
