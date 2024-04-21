@@ -29,6 +29,10 @@ func ToClash(accounts []db.DBScheme, args ...string) string {
 			proxy = append(proxy, fmt.Sprintf("    udp: %t", true))
 			proxy = append(proxy, fmt.Sprintf("    network: %s", account.Transport))
 
+			if account.VPN == C.TypeVMess {
+				proxy = append(proxy, fmt.Sprintf("    alterId: %d", 0))
+			}
+
 			if account.TLS {
 				proxy = append(proxy, fmt.Sprintf("    skip-cert-verify: %t", true))
 				proxy = append(proxy, fmt.Sprintf("    servername: %s", account.SNI))
