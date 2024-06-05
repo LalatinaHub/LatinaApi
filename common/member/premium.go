@@ -71,7 +71,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 		vpsInfo geoip.GeoIpJson
 	)
 
-	resp, err := apiHelper.Fetch("https://" + accountData.Domain + "/info")
+	resp, err := apiHelper.Fetch("http://" + accountData.Domain + "/info")
 	if err != nil {
 		return []db.DBScheme{}
 	}
