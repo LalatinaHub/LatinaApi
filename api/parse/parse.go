@@ -2,9 +2,12 @@ package parseRoute
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
+	"net/url"
 	"strings"
 
+	apiHelper "github.com/LalatinaHub/LatinaApi/api/helper"
 	"github.com/LalatinaHub/LatinaSub-go/account"
 	"github.com/LalatinaHub/LatinaSub-go/provider"
 	"github.com/gin-gonic/gin"
@@ -18,6 +21,7 @@ func ParseHandler(c *gin.Context) {
 	var (
 		data     PostData
 		accounts []account.Account
+		buf      *strings.Builder = new(strings.Builder)
 	)
 
 	if err := c.ShouldBind(&data); err != nil {
@@ -25,11 +29,16 @@ func ParseHandler(c *gin.Context) {
 		return
 	}
 
-	for _, url := range strings.Split(data.Urls, ",") {
-		outbounds, err := provider.Parse(url)
+	urls := strings.Join(strings.Split(data.Urls, ","), "|")
+	resp, err := apiHelper.Fetch("https://sub.bonds.id/sub2?target=clash&insert=false&url=" + url.QueryEscape(urls))
+	if err == nil || resp.StatusCode == 200 {
+		io.Copy(buf, resp.Body)
 
+		outbounds, err := provider.Parse(buf.String())
 		if err == nil && len(outbounds) > 0 {
-			accounts = append(accounts, *account.New(outbounds[0]))
+			for _, outbound := range outbounds {
+				accounts = append(accounts, *account.New(outbound))
+			}
 		}
 	}
 

@@ -14,7 +14,7 @@ import (
 
 func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 	var (
-		baseConfig = "https://raw.githubusercontent.com/iyarivky/sing-ribet/main/config/config.json"
+		baseConfig = "https://raw.githubusercontent.com/malikshi/sing-box-examples/refs/heads/main/BoxForMagisk/config.json"
 		tags       []string
 		outbounds  []option.Outbound
 	)
