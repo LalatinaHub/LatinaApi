@@ -5,19 +5,19 @@ go 1.22.7
 toolchain go1.23.2
 
 require (
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20240702171100-97fdb5e1708c
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20241120135758-3b1c8624b74c
 	github.com/gin-gonic/gin v1.10.0
 	github.com/projectdiscovery/subfinder/v2 v2.6.7
 	github.com/sagernet/sing-box v1.10.1
 	github.com/ulule/limiter/v3 v3.11.2
 )
 
-replace github.com/LalatinaHub/LatinaSub-go => ../LatinaSub-go
+// replace github.com/LalatinaHub/LatinaSub-go => ../LatinaSub-go
 
 require (
 	aead.dev/minisign v0.3.0 // indirect
 	berty.tech/go-libtor v1.0.385 // indirect
-	github.com/Masterminds/semver/v3 v3.3.0 // indirect
+	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Mzack9999/gcache v0.0.0-20230410081825-519e28eab057 // indirect
 	github.com/Mzack9999/go-http-digest-auth-client v0.6.1-0.20220414142836-eb8883508809 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
