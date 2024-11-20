@@ -85,9 +85,15 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		}
 	}
 
-	// options.Route.GeoIP.DownloadURL = ""
-	// options.Route.Geosite.DownloadURL = ""
-	options.Experimental.ClashAPI.Secret = ""
+	options.Experimental = &option.ExperimentalOptions{
+		CacheFile: &option.CacheFileOptions{
+			Enabled: true,
+		},
+		ClashAPI: &option.ClashAPIOptions{
+			ExternalController: "0.0.0.0:9090",
+			ExternalUI:         "/dashboard",
+		},
+	}
 
 	return options
 }
