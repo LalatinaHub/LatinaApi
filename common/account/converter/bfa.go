@@ -69,7 +69,7 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 
 	filteredOutbounds := []option.Outbound{}
 	for _, outbound := range options.Outbounds {
-		switch outbound.Tag {
+		switch outbound.Type {
 		case C.TypeBlock, C.TypeDirect, C.TypeDNS, C.TypeSelector, C.TypeURLTest:
 			filteredOutbounds = append(filteredOutbounds, outbound)
 		}
@@ -79,9 +79,9 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 	for i, outbound := range options.Outbounds {
 		switch outbound.Tag {
 		case "Internet", "Lock Region ID":
-			options.Outbounds[i].SelectorOptions.Outbounds = append(options.Outbounds[i].SelectorOptions.Outbounds, tags...)
+			options.Outbounds[i].SelectorOptions.Outbounds = tags
 		case "Best Latency":
-			options.Outbounds[i].URLTestOptions.Outbounds = append(options.Outbounds[i].URLTestOptions.Outbounds, tags...)
+			options.Outbounds[i].URLTestOptions.Outbounds = tags
 		}
 	}
 
