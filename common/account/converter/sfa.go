@@ -13,9 +13,9 @@ import (
 	"github.com/sagernet/sing-box/option"
 )
 
-func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
+func ToSfa(accounts []db.DBScheme, args ...string) option.Options {
 	var (
-		baseConfig = "https://raw.githubusercontent.com/malikshi/sing-box-examples/refs/heads/main/Sing-boxForMobile(iOS%20SFI%20or%20Android%20SFA)/sing-box.json"
+		baseConfig = "https://raw.githubusercontent.com/dickymuliafiqri/sing-box-examples/refs/heads/main/SFA/config.json"
 		tags       []string
 		outbounds  []option.Outbound
 	)
@@ -78,7 +78,9 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 	options.Outbounds = append(filteredOutbounds, outbounds...)
 	for i, outbound := range options.Outbounds {
 		switch outbound.Tag {
-		case "Internet", "Lock Region ID":
+		case "Internet":
+			options.Outbounds[i].SelectorOptions.Outbounds = append([]string{"Best Latency"}, tags...)
+		case "Lock Region ID":
 			options.Outbounds[i].SelectorOptions.Outbounds = tags
 		case "Best Latency":
 			options.Outbounds[i].URLTestOptions.Outbounds = tags

@@ -14,7 +14,7 @@ func ToSing(accounts []db.DBScheme, args ...string) option.Options {
 				outbounds = []option.Outbound{}
 			)
 
-			for _, outbound := range ToBfa(accounts, args...).Outbounds {
+			for _, outbound := range ToSfa(accounts, args...).Outbounds {
 				switch outbound.Type {
 				case C.TypeTrojan, C.TypeVMess, C.TypeShadowsocks, C.TypeVLESS, C.TypeHysteria2:
 					proxyTags = append(proxyTags, outbound.Tag)
