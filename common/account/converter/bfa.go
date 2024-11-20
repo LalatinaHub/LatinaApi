@@ -9,6 +9,7 @@ import (
 	apiHelper "github.com/LalatinaHub/LatinaApi/api/helper"
 	"github.com/LalatinaHub/LatinaSub-go/db"
 	"github.com/LalatinaHub/LatinaSub-go/provider"
+	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
 )
 
@@ -19,19 +20,16 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		outbounds  []option.Outbound
 	)
 
-	for _, nodes := range strings.Split(ToRaw(accounts, args...), "\n") {
-		if proxies, err := provider.Parse(nodes); err == nil {
-			for _, outbound := range proxies {
-				if _, err := json.Marshal(outbound); err != nil {
-					fmt.Println("Error Provider:", err.Error())
-					fmt.Println("Error Parsing:", nodes)
-				} else {
-					outbounds = append(outbounds, outbound)
-					tags = append(tags, outbound.Tag)
-				}
+	if proxies, err := provider.Parse(ToClash(accounts)); err == nil {
+		for _, outbound := range proxies {
+			if _, err := json.Marshal(outbound); err != nil {
+				fmt.Println("Error Provider:", err.Error())
+				fmt.Println("Error Parsing:", outbound.Tag)
+			} else {
+				outbounds = append(outbounds, outbound)
+				tags = append(tags, outbound.Tag)
 			}
 		}
-
 	}
 
 	var (
@@ -69,7 +67,15 @@ func ToBfa(accounts []db.DBScheme, args ...string) option.Options {
 		}
 	}
 
-	options.Outbounds = append(options.Outbounds, outbounds...)
+	filteredOutbounds := []option.Outbound{}
+	for _, outbound := range options.Outbounds {
+		switch outbound.Tag {
+		case C.TypeBlock, C.TypeDirect, C.TypeDNS, C.TypeSelector, C.TypeURLTest:
+			filteredOutbounds = append(filteredOutbounds, outbound)
+		}
+	}
+
+	options.Outbounds = append(filteredOutbounds, outbounds...)
 	for i, outbound := range options.Outbounds {
 		switch outbound.Tag {
 		case "Internet", "Lock Region ID":
