@@ -5,10 +5,10 @@ go 1.22.7
 toolchain go1.23.2
 
 require (
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20241120135758-3b1c8624b74c
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20241123131200-3bc8692dab5a
 	github.com/gin-gonic/gin v1.10.0
 	github.com/projectdiscovery/subfinder/v2 v2.6.7
-	github.com/sagernet/sing-box v1.10.1
+	github.com/sagernet/sing-box v1.10.2
 	github.com/ulule/limiter/v3 v3.11.2
 )
 
@@ -27,14 +27,14 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/bits-and-blooms/bitset v1.15.0 // indirect
+	github.com/bits-and-blooms/bitset v1.16.0 // indirect
 	github.com/bytedance/sonic v1.12.4 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
 	github.com/caddyserver/certmagic v0.21.4 // indirect
 	github.com/caddyserver/zerossl v0.1.3 // indirect
 	github.com/charmbracelet/glamour v0.8.0 // indirect
 	github.com/charmbracelet/lipgloss v1.0.0 // indirect
-	github.com/charmbracelet/x/ansi v0.4.5 // indirect
+	github.com/charmbracelet/x/ansi v0.5.2 // indirect
 	github.com/cheggaaa/pb/v3 v3.1.5 // indirect
 	github.com/cloudflare/circl v1.5.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -48,8 +48,8 @@ require (
 	github.com/dsnet/compress v0.0.2-0.20210315054119-f66993602bf5 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
-	github.com/gaissmai/bart v0.13.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
+	github.com/gaissmai/bart v0.13.3 // indirect
 	github.com/go-chi/chi/v5 v5.1.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
@@ -118,7 +118,7 @@ require (
 	github.com/sagernet/bbolt v0.0.0-20231014093535-ea5cb2fe9f0a // indirect
 	github.com/sagernet/cloudflare-tls v0.0.0-20231208171750-a4483c1b7cd1 // indirect
 	github.com/sagernet/fswatch v0.1.1 // indirect
-	github.com/sagernet/gvisor v0.0.0-20241021032506-a4324256e4a3 // indirect
+	github.com/sagernet/gvisor v0.0.0-20241123041152-536d05261cff // indirect
 	github.com/sagernet/netlink v0.0.0-20240916134442-83396419aa8b // indirect
 	github.com/sagernet/nftables v0.3.0-beta.4 // indirect
 	github.com/sagernet/quic-go v0.48.1-beta.1 // indirect
@@ -130,11 +130,11 @@ require (
 	github.com/sagernet/sing-shadowsocks v0.2.7 // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.2.0 // indirect
 	github.com/sagernet/sing-shadowtls v0.1.5 // indirect
-	github.com/sagernet/sing-tun v0.4.1 // indirect
+	github.com/sagernet/sing-tun v0.4.2 // indirect
 	github.com/sagernet/sing-vmess v0.1.12 // indirect
 	github.com/sagernet/smux v0.0.0-20231208180855-7041f6ea79e7 // indirect
 	github.com/sagernet/utls v1.6.7 // indirect
-	github.com/sagernet/wireguard-go v0.0.0-20231215174105-89dec3b2f3e8 // indirect
+	github.com/sagernet/wireguard-go v0.0.1-beta.4 // indirect
 	github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
@@ -159,7 +159,7 @@ require (
 	github.com/yuin/goldmark v1.7.8 // indirect
 	github.com/yuin/goldmark-emoji v1.0.4 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	github.com/zcalusic/sysinfo v1.1.2 // indirect
+	github.com/zcalusic/sysinfo v1.1.3 // indirect
 	github.com/zeebo/blake3 v0.2.4 // indirect
 	github.com/zmap/rc2 v0.0.0-20190804163417-abaa70531248 // indirect
 	github.com/zmap/zcrypto v0.0.0-20240803002437-3a861682ac77 // indirect
@@ -175,6 +175,7 @@ require (
 	golang.org/x/term v0.26.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.27.0 // indirect
+	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697 // indirect
 	google.golang.org/grpc v1.68.0 // indirect
 	gopkg.in/djherbis/times.v1 v1.3.0 // indirect
