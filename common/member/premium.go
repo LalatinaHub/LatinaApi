@@ -106,7 +106,7 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 								continue
 							} else if (tls == "0" && port == 443) || (tls == "1" && port == 80) {
 								continue
-							} else if network == "tcp" && mode == "cdn" {
+							} else if (network == "tcp" || network == "grpc") && mode == "cdn" {
 								continue
 							} else if network == "grpc" && port == 80 {
 								continue
