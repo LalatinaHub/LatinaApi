@@ -110,8 +110,6 @@ func GenerateDBSchemes(accountData PremiumData, c *gin.Context) []db.DBScheme {
 								continue
 							} else if network == "grpc" && port == 80 {
 								continue
-							} else if vpn == "vless" && network == "tcp" {
-								continue
 							} else if accountData.VPN != vpn {
 								continue
 							} else if accountData.Domain == "" {
