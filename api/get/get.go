@@ -1,6 +1,7 @@
 package getRoute
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -16,12 +17,13 @@ import (
 
 func GetHandler(c *gin.Context) {
 	var (
-		proxies  []db.DBScheme
-		format   = c.Query("format")
-		password = c.Query("pass")
-		cdn      = strings.Split(c.DefaultQuery("cdn", ""), ",")
-		sni      = strings.Split(c.DefaultQuery("sni", ""), ",")
-		args     = strings.Split(c.DefaultQuery("arg", ""), ",")
+		proxies   []db.DBScheme
+		format    = c.Query("format")
+		password  = c.Query("pass")
+		subdomain = c.Query("subdomain")
+		cdn       = strings.Split(c.DefaultQuery("cdn", ""), ",")
+		sni       = strings.Split(c.DefaultQuery("sni", ""), ",")
+		args      = strings.Split(c.DefaultQuery("arg", ""), ",")
 	)
 
 	// Build headers and filters
@@ -57,6 +59,21 @@ func GetHandler(c *gin.Context) {
 
 	// Populate bugs
 	proxies = account.PopulateBugs(proxies, cdn, sni)
+
+	// Assign subdomain
+	if subdomain != "" {
+		for i, a := range proxies {
+			switch a.ConnMode {
+			case "cdn":
+				a.Host = fmt.Sprintf("%s.%s", subdomain, a.Host)
+				a.SNI = fmt.Sprintf("%s.%s", subdomain, a.SNI)
+			case "sni":
+				a.Server = fmt.Sprintf("%s.%s", subdomain, a.Server)
+			}
+
+			proxies[i] = a
+		}
+	}
 
 	// Set headers and filters
 	c.Header("Content-Disposition", disposition)
