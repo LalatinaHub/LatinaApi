@@ -6,7 +6,6 @@ import (
 	"os"
 
 	getRoute "github.com/LalatinaHub/LatinaApi/api/get"
-	logRoute "github.com/LalatinaHub/LatinaApi/api/log"
 	"github.com/LalatinaHub/LatinaApi/api/middleware"
 	parseRoute "github.com/LalatinaHub/LatinaApi/api/parse"
 	subfinderRoute "github.com/LalatinaHub/LatinaApi/api/subfinder"
@@ -34,7 +33,6 @@ func Start() {
 	Router.Use(middleware.RateLimiter())
 
 	Router.GET("/get", getRoute.GetHandler)
-	Router.GET("/log", logRoute.LogHandler)
 	Router.POST("/parse", parseRoute.ParseHandler)
 	Router.GET("/subfinder", subfinderRoute.SubfinderHandler)
 

@@ -3,7 +3,6 @@ package helper
 import (
 	"encoding/base64"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
@@ -13,28 +12,6 @@ import (
 
 func EncodeToBase64(text string) string {
 	return base64.StdEncoding.EncodeToString([]byte(text))
-}
-
-func GetLastLog() string {
-	var (
-		file, err          = os.ReadFile("log/scrape.log")
-		logLines  []string = strings.Split(string(file), "\n")
-		logStr    string
-	)
-
-	if err != nil {
-		logStr = err.Error()
-	} else {
-		for i := len(logLines) - 1; i > len(logLines)-100; i-- {
-			if i <= -1 {
-				break
-			}
-
-			logStr = logStr + logLines[i] + "\n"
-		}
-	}
-
-	return logStr
 }
 
 func BuildFilter(c *gin.Context) string {
@@ -169,22 +146,4 @@ func BuildFilter(c *gin.Context) string {
 	result = result + fmt.Sprintf(" LIMIT %d", limit)
 
 	return strings.ReplaceAll(result, `"`, "'")
-}
-
-func LogFuncToFile(f func(), filename string) {
-	stdout := os.Stdout
-
-	_ = os.Mkdir("log/", os.ModePerm)
-	_ = os.Remove("log/" + filename)
-	logFile, _ := os.OpenFile("log/"+filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	defer logFile.Close()
-
-	os.Stdout = logFile
-	defer func() {
-		// Restore stdout
-		os.Stdout = stdout
-	}()
-
-	// Run the function
-	f()
 }
