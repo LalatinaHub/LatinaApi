@@ -5,7 +5,7 @@ go 1.22.7
 toolchain go1.23.2
 
 require (
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20241227023226-2c368a77e18c
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20241227142240-d612b367016b
 	github.com/gin-gonic/gin v1.10.0
 	github.com/projectdiscovery/subfinder/v2 v2.6.7
 	github.com/sagernet/sing-box v1.10.2
