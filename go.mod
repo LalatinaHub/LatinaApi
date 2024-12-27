@@ -5,7 +5,7 @@ go 1.22.7
 toolchain go1.23.2
 
 require (
-	github.com/LalatinaHub/LatinaSub-go v0.0.0-20241123131200-3bc8692dab5a
+	github.com/LalatinaHub/LatinaSub-go v0.0.0-20241227023226-2c368a77e18c
 	github.com/gin-gonic/gin v1.10.0
 	github.com/projectdiscovery/subfinder/v2 v2.6.7
 	github.com/sagernet/sing-box v1.10.2
@@ -20,6 +20,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Mzack9999/gcache v0.0.0-20230410081825-519e28eab057 // indirect
 	github.com/Mzack9999/go-http-digest-auth-client v0.6.1-0.20220414142836-eb8883508809 // indirect
+	github.com/NicoNex/echotron/v3 v3.39.0 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
