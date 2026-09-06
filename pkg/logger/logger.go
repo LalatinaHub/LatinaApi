@@ -1,4 +1,4 @@
-﻿package logger
+package logger
 
 import (
 	"io"
@@ -42,9 +42,9 @@ func SetupLogger(levelStr string, isProduction bool) {
 
 func parseLogLevel(level string) zerolog.Level {
 	switch strings.ToLower(level) {
-	case "debug":
+	case "debug", "development", "dev":
 		return zerolog.DebugLevel
-	case "info":
+	case "info", "production", "prod":
 		return zerolog.InfoLevel
 	case "warn", "warning":
 		return zerolog.WarnLevel

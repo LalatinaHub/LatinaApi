@@ -1,10 +1,8 @@
-﻿package repository
+package repository
 
 import (
 	"context"
-	"crypto/rand"
 	"database/sql"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"time"
@@ -46,15 +44,11 @@ func (r *userRepo) GetUserByID(ctx context.Context, id int64) (*model.User, erro
 }
 
 func (r *userRepo) CreateUserWithDefaults(ctx context.Context, id int64) (*model.User, error) {
-	randBytes := make([]byte, 4)
-	_, _ = rand.Read(randBytes)
-	randPass := hex.EncodeToString(randBytes)
-
 	now := time.Now()
 	u := &model.User{
 		ID:         id,
 		Token:      uuid.New().String(),
-		Password:   randPass,
+		Password:   uuid.New().String(), // UUIDv4 password
 		Expired:    time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.Location()),
 		ServerCode: "",
 		Quota:      1000, // 1000 MB

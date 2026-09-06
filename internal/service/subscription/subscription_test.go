@@ -1,4 +1,4 @@
-﻿package subscription
+package subscription
 
 import (
 	"context"
@@ -68,7 +68,7 @@ func TestSubscriptionService_SuccessCases(t *testing.T) {
 	validUser := &model.User{
 		ID:         1,
 		Token:      "tok-valid",
-		Password:   "pass123",
+		Password:   "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
 		Expired:    now.Add(24 * time.Hour),
 		ServerCode: "SG01",
 		Quota:      500, // 500 MB
@@ -87,7 +87,16 @@ func TestSubscriptionService_SuccessCases(t *testing.T) {
 
 	userRepo := &mockUserRepo{user: validUser}
 	serverRepo := &mockServerRepo{server: server}
-	proxyRepo := &mockProxyRepo{}
+	b64FreeVless := "dmxlc3M6Ly8zMGE4OGM0MC01ODFlLTQ5NTItYWE0Yy04YWY5NTY4NmVkZTBAd3d3Lmdvdi51YTo4ODgwP2VuY3J5cHRpb249bm9uZSZzZWN1cml0eT1ub25lJnR5cGU9d3MmaG9zdD1yYXBpZC1sYWItOTVlZi4xNzMtNzRjLndvcmtlcnMuZGV2JnBhdGg9L3B5aXA9cHJveHlpcC5rci5jbWxpdXNzc3MubmV0I0BEZWx0YUtyb25lY2tlckdpdGh1Yg=="
+	proxyRepo := &mockProxyRepo{
+		proxies: []model.ProxyNode{
+			{
+				VPN:      "vless",
+				ConnMode: "cdn",
+				Raw:      b64FreeVless,
+			},
+		},
+	}
 	convSvc := converter.NewConverterService()
 
 	svc := NewSubscriptionService(userRepo, serverRepo, proxyRepo, convSvc, "LatinaHub")
@@ -114,15 +123,16 @@ func TestSubscriptionService_SuccessCases(t *testing.T) {
 	assert.Equal(t, "config.json", resSingbox.Filename)
 	assert.Contains(t, resSingbox.Content, "mixed-in")
 
-	// 3. v2rayNG User-Agent (Base64)
-	resB64, err := svc.GetSubscription(ctx, SubscriptionRequest{
+	// 3. v2rayNG User-Agent (Raw links, not base64)
+	resV2Ray, err := svc.GetSubscription(ctx, SubscriptionRequest{
 		Token:     "tok-valid",
 		UserAgent: "v2rayNG/1.8.5",
 	})
 	require.NoError(t, err)
-	assert.Equal(t, "text/plain; charset=utf-8", resB64.ContentType)
-	assert.Equal(t, "sub.txt", resB64.Filename)
-	assert.NotEmpty(t, resB64.Content)
+	assert.Equal(t, "text/plain; charset=utf-8", resV2Ray.ContentType)
+	assert.Equal(t, "sub.txt", resV2Ray.Filename)
+	assert.NotEmpty(t, resV2Ray.Content)
+	assert.Contains(t, resV2Ray.Content, "trojan://")
 
 	// 4. Raw format parameter override
 	resRaw, err := svc.GetSubscription(ctx, SubscriptionRequest{
@@ -131,6 +141,8 @@ func TestSubscriptionService_SuccessCases(t *testing.T) {
 	})
 	require.NoError(t, err)
 	assert.Contains(t, resRaw.Content, "trojan://")
+	assert.Contains(t, resRaw.Content, "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d")
+	assert.NotContains(t, resRaw.Content, "tok-valid@")
 
 	// 5. CDN and SNI Domain overrides
 	resOverride, err := svc.GetSubscription(ctx, SubscriptionRequest{
@@ -141,6 +153,43 @@ func TestSubscriptionService_SuccessCases(t *testing.T) {
 	})
 	require.NoError(t, err)
 	assert.Contains(t, resOverride.Content, "custom-cdn.com")
+
+	// 6. Comma-separated VPN and Mode filters
+	resMulti, err := svc.GetSubscription(ctx, SubscriptionRequest{
+		Token:  "tok-valid",
+		Format: "raw",
+		VPN:    "vmess,vless,trojan",
+		Mode:   "cdn,sni",
+	})
+	require.NoError(t, err)
+	assert.NotEmpty(t, resMulti.Content)
+	assert.Contains(t, resMulti.Content, "trojan://")
+
+	// 7. format=base64 and default format return raw unencoded URIs
+	resExplicitB64, err := svc.GetSubscription(ctx, SubscriptionRequest{
+		Token:  "tok-valid",
+		Format: "base64",
+	})
+	require.NoError(t, err)
+	assert.Contains(t, resExplicitB64.Content, "trojan://")
+	assert.NotContains(t, resExplicitB64.Content, "ey")
+
+	// 8. Empty format with generic browser User-Agent returns raw
+	resBrowser, err := svc.GetSubscription(ctx, SubscriptionRequest{
+		Token:     "tok-valid",
+		UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+	})
+	require.NoError(t, err)
+	assert.Contains(t, resBrowser.Content, "trojan://")
+
+	// 9. Free node from DB with base64 encoded raw URL is decoded into plaintext URI
+	resWithFree, err := svc.GetSubscription(ctx, SubscriptionRequest{
+		Token:  "tok-valid",
+		Format: "raw",
+	})
+	require.NoError(t, err)
+	assert.Contains(t, resWithFree.Content, "vless://30a88c40-581e-4952-aa4c-8af95686ede0@www.gov.ua:8880")
+	assert.NotContains(t, resWithFree.Content, "dmxlc3M6")
 }
 
 func TestSubscriptionService_ErrorCases(t *testing.T) {
@@ -178,6 +227,12 @@ func TestSubscriptionService_ErrorCases(t *testing.T) {
 	svcInvalid := NewSubscriptionService(&mockUserRepo{err: model.ErrUserNotFound}, &mockServerRepo{}, &mockProxyRepo{}, convSvc, "")
 	_, err = svcInvalid.GetSubscription(ctx, SubscriptionRequest{Token: "not-found"})
 	assert.ErrorIs(t, err, model.ErrUserNotFound)
+
+	// 4. Nil user repository safety
+	svcNil := NewSubscriptionService(nil, nil, nil, convSvc, "")
+	_, err = svcNil.GetSubscription(ctx, SubscriptionRequest{Token: "tok-test"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "database connection unavailable")
 }
 
 func TestDetectFormat(t *testing.T) {
@@ -187,7 +242,7 @@ func TestDetectFormat(t *testing.T) {
 	assert.Equal(t, "singbox", DetectFormat("sing-box/1.14.0"))
 	assert.Equal(t, "sfa", DetectFormat("SFA/1.10.0"))
 	assert.Equal(t, "bfr", DetectFormat("BFR/1.10.0"))
-	assert.Equal(t, "base64", DetectFormat("v2rayNG/1.8.5"))
-	assert.Equal(t, "base64", DetectFormat("Shadowrocket/1990"))
-	assert.Equal(t, "base64", DetectFormat("Mozilla/5.0"))
+	assert.Equal(t, "raw", DetectFormat("v2rayNG/1.8.5"))
+	assert.Equal(t, "raw", DetectFormat("Shadowrocket/1990"))
+	assert.Equal(t, "raw", DetectFormat("Mozilla/5.0"))
 }

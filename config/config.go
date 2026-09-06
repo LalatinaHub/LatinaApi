@@ -1,6 +1,7 @@
-﻿package config
+package config
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
@@ -20,10 +21,9 @@ type Config struct {
 	RateLimitBurst           int
 }
 
-// LoadConfig loads configuration from environment variables and .env file.
-func LoadConfig() (*Config, error) {
-	// Attempt loading .env file; ignore if missing
-	_ = godotenv.Load()
+// LoadConfig loads configuration from environment variables and an optional .env file.
+func LoadConfig(filenames ...string) (*Config, error) {
+	loadDotEnv(filenames...)
 
 	cfg := &Config{
 		Port:                     getEnv("PORT", "8080"),
@@ -78,4 +78,31 @@ func getEnvFloat(key string, defaultVal float64) float64 {
 		}
 	}
 	return defaultVal
+}
+
+// loadDotEnv loads environment variables from .env file, cleanly stripping UTF-8 BOM if present.
+func loadDotEnv(filenames ...string) {
+	target := ".env"
+	if len(filenames) > 0 && filenames[0] != "" {
+		target = filenames[0]
+	}
+
+	data, err := os.ReadFile(target)
+	if err != nil {
+		return
+	}
+
+	// Strip UTF-8 Byte Order Mark (0xEF, 0xBB, 0xBF) if present
+	data = bytes.TrimPrefix(data, []byte("\xef\xbb\xbf"))
+
+	envMap, err := godotenv.Unmarshal(string(data))
+	if err != nil {
+		return
+	}
+
+	for k, v := range envMap {
+		if os.Getenv(k) == "" {
+			_ = os.Setenv(k, v)
+		}
+	}
 }

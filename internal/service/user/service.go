@@ -1,4 +1,4 @@
-﻿package user
+package user
 
 import (
 	"context"
@@ -28,6 +28,10 @@ func NewUserService(userRepo repository.UserRepository, kvRepo repository.KVRepo
 }
 
 func (s *userService) GetUser(ctx context.Context, apiToken string, id int64) (*model.User, error) {
+	if s.kvRepo == nil || s.userRepo == nil {
+		return nil, errors.New("database connection unavailable")
+	}
+
 	// Verify API token if configured in database
 	configuredToken, err := s.kvRepo.GetValueByKey(ctx, "apiToken")
 	if err != nil {

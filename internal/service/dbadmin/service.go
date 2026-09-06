@@ -1,8 +1,9 @@
-﻿package dbadmin
+package dbadmin
 
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -29,6 +30,10 @@ func NewDBAdminService(db *sql.DB, kvRepo repository.KVRepository) DBAdminServic
 }
 
 func (s *dbAdminService) ExecSQL(ctx context.Context, apiToken string, queries []string) ([]int64, error) {
+	if s.db == nil || s.kvRepo == nil {
+		return nil, errors.New("database connection unavailable")
+	}
+
 	// 1. Verify API Token
 	configuredToken, err := s.kvRepo.GetValueByKey(ctx, "apiToken")
 	if err != nil {

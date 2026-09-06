@@ -1,4 +1,4 @@
-﻿package converter
+package converter
 
 import (
 	"fmt"
@@ -76,7 +76,7 @@ func (s *converterService) ConvertRaw(rawConfig string, format string) (string, 
 	case "base64", "b64":
 		return conv.ToBase64(), nil
 	default:
-		// Default to Base64
-		return conv.ToBase64(), nil
+		// Default to raw
+		return conv.ToRawString(), nil
 	}
 }

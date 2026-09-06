@@ -1,4 +1,4 @@
-﻿package api
+package api
 
 import (
 	"net/http"
@@ -33,7 +33,7 @@ func SetupRouter(cfg RouterConfig) *gin.Engine {
 
 	// Global middlewares
 	r.Use(gin.Recovery())
-	r.Use(middleware.RequestLoggerMiddleware())
+	r.Use(middleware.RequestLoggerMiddleware(cfg.IsProduction))
 	r.Use(middleware.CORSMiddleware())
 	r.Use(middleware.ErrorMiddleware())
 

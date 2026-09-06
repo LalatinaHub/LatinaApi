@@ -1,4 +1,4 @@
-﻿package handler
+package handler
 
 import (
 	"io"
@@ -21,7 +21,7 @@ func NewConvertHandler(convService converter.ConverterService) *ConvertHandler {
 
 // Convert handles POST /api/v1/convert
 func (h *ConvertHandler) Convert(c *gin.Context) {
-	format := c.DefaultQuery("format", "base64")
+	format := c.DefaultQuery("format", "raw")
 
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil || len(strings.TrimSpace(string(body))) == 0 {

@@ -1,7 +1,8 @@
-﻿package subscription
+package subscription
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -11,6 +12,7 @@ import (
 	"github.com/LalatinaHub/LatinaApi/internal/repository"
 	"github.com/LalatinaHub/LatinaApi/internal/service/converter"
 	"github.com/LalatinaHub/LatinaApi/pkg/httputil"
+	"github.com/LalatinaHub/common/proxy"
 	"github.com/LalatinaHub/common/region"
 )
 
@@ -88,6 +90,10 @@ func NewSubscriptionService(
 func (s *subscriptionService) GetSubscription(ctx context.Context, req SubscriptionRequest) (*SubscriptionResult, error) {
 	if req.Token == "" {
 		return nil, model.ErrInvalidToken
+	}
+
+	if s.userRepo == nil {
+		return nil, errors.New("database connection unavailable")
 	}
 
 	// 1. Authenticate user
@@ -180,15 +186,10 @@ func (s *subscriptionService) GetSubscription(ctx context.Context, req Subscript
 		contentType = "application/json; charset=utf-8"
 		filename = "bfr.json"
 
-	case "raw":
-		content = s.converterService.ToRawString(nodes)
-		contentType = "text/plain; charset=utf-8"
-		filename = "sub.txt"
-
-	case "base64", "b64":
+	case "raw", "base64", "b64":
 		fallthrough
 	default:
-		content = s.converterService.ToBase64(nodes)
+		content = s.converterService.ToRawString(nodes)
 		contentType = "text/plain; charset=utf-8"
 		filename = "sub.txt"
 	}
@@ -213,6 +214,10 @@ func (s *subscriptionService) GetSubscription(ctx context.Context, req Subscript
 }
 
 func (s *subscriptionService) buildPremiumNodes(ctx context.Context, user *model.User, req SubscriptionRequest) ([]model.ProxyNode, error) {
+	if s.serverRepo == nil {
+		return nil, errors.New("database connection unavailable")
+	}
+
 	server, err := s.serverRepo.GetServerByCode(ctx, user.ServerCode)
 	if err != nil {
 		return nil, err
@@ -231,21 +236,27 @@ func (s *subscriptionService) buildPremiumNodes(ctx context.Context, user *model
 
 	var premiumNodes []model.ProxyNode
 	vpnProto := strings.ToLower(user.VPN)
-	if req.VPN != "" && !strings.EqualFold(req.VPN, vpnProto) {
+	if !matchesFilter(req.VPN, vpnProto) {
 		return nil, nil
 	}
 
+	// Use account password (UUIDv4) as primary VPN credential
+	credential := user.Password
+	if credential == "" {
+		credential = user.Token
+	}
+
 	// CDN WS Variant
-	if req.Mode == "" || strings.EqualFold(req.Mode, "cdn") {
-		if req.Transport == "" || strings.EqualFold(req.Transport, "ws") {
+	if matchesFilter(req.Mode, "cdn") {
+		if req.Transport == "" || matchesFilter(req.Transport, "ws") {
 			// TLS 443
 			if req.TLS == nil || *req.TLS {
 				node := model.ProxyNode{
 					VPN:         vpnProto,
 					Server:      domain,
 					ServerPort:  443,
-					UUID:        user.Token,
-					Password:    user.Password,
+					UUID:        credential,
+					Password:    credential,
 					TLS:         true,
 					Transport:   "ws",
 					Path:        fmt.Sprintf("/%s-ws", vpnProto),
@@ -263,8 +274,8 @@ func (s *subscriptionService) buildPremiumNodes(ctx context.Context, user *model
 					VPN:         vpnProto,
 					Server:      domain,
 					ServerPort:  80,
-					UUID:        user.Token,
-					Password:    user.Password,
+					UUID:        credential,
+					Password:    credential,
 					TLS:         false,
 					Transport:   "ws",
 					Path:        fmt.Sprintf("/%s-ws", vpnProto),
@@ -278,13 +289,13 @@ func (s *subscriptionService) buildPremiumNodes(ctx context.Context, user *model
 		}
 
 		// CDN gRPC Variant (TLS 443 only)
-		if (req.Transport == "" || strings.EqualFold(req.Transport, "grpc")) && (req.TLS == nil || *req.TLS) {
+		if (req.Transport == "" || matchesFilter(req.Transport, "grpc")) && (req.TLS == nil || *req.TLS) {
 			node := model.ProxyNode{
 				VPN:         vpnProto,
 				Server:      domain,
 				ServerPort:  443,
-				UUID:        user.Token,
-				Password:    user.Password,
+				UUID:        credential,
+				Password:    credential,
 				TLS:         true,
 				Transport:   "grpc",
 				ServiceName: fmt.Sprintf("%s-grpc", vpnProto),
@@ -299,13 +310,13 @@ func (s *subscriptionService) buildPremiumNodes(ctx context.Context, user *model
 	}
 
 	// SNI Variant (TLS 443 TCP/gRPC only)
-	if (req.Mode == "" || strings.EqualFold(req.Mode, "sni")) && (req.TLS == nil || *req.TLS) {
+	if matchesFilter(req.Mode, "sni") && (req.TLS == nil || *req.TLS) {
 		node := model.ProxyNode{
 			VPN:         vpnProto,
 			Server:      domain,
 			ServerPort:  443,
-			UUID:        user.Token,
-			Password:    user.Password,
+			UUID:        credential,
+			Password:    credential,
 			TLS:         true,
 			Transport:   "tcp",
 			Host:        domain,
@@ -321,13 +332,22 @@ func (s *subscriptionService) buildPremiumNodes(ctx context.Context, user *model
 }
 
 func applyDomainOverrides(node *model.ProxyNode, cdnOverride, sniOverride string) {
+	node.Raw = proxy.DecodeIfBase64(node.Raw)
+	modified := false
 	if cdnOverride != "" && strings.EqualFold(node.ConnMode, "cdn") {
 		node.Server = cdnOverride
 		node.Host = cdnOverride
+		modified = true
 	}
 	if sniOverride != "" && strings.EqualFold(node.ConnMode, "sni") {
 		node.Server = sniOverride
 		node.SNI = sniOverride
+		modified = true
+	}
+	if modified && node.Raw != "" {
+		if formatted, err := proxy.FormatString(node); err == nil && formatted != "" {
+			node.Raw = formatted
+		}
 	}
 }
 
@@ -350,9 +370,21 @@ func DetectFormat(userAgent string) string {
 	if strings.Contains(ua, "v2rayng") || strings.Contains(ua, "shadowrocket") ||
 		strings.Contains(ua, "nekobox") || strings.Contains(ua, "nekoray") ||
 		strings.Contains(ua, "streisand") {
-		return "base64"
+		return "raw"
 	}
 
-	// Default fallback to Base64
-	return "base64"
+	// Default fallback to raw unencoded proxy URIs
+	return "raw"
+}
+
+func matchesFilter(filterValue, actualValue string) bool {
+	if filterValue == "" {
+		return true
+	}
+	for _, part := range strings.Split(filterValue, ",") {
+		if strings.EqualFold(strings.TrimSpace(part), actualValue) {
+			return true
+		}
+	}
+	return false
 }

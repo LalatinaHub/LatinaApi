@@ -14,6 +14,7 @@ High-performance Universal Subscription & Proxy Engine for the LatinaHub ecosyst
 ## Getting Started
 
 ### Prerequisites
+
 - Go 1.24+ (tested on Go 1.25+ and Go 1.27+)
 - Turso / LibSQL Database
 
@@ -33,15 +34,15 @@ go run ./cmd/api
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `8080` | HTTP port to listen on |
-| `APP_ENV` | `development` | Environment mode (`development` or `production`) |
-| `TURSO_DATABASE_URL` | `file:local.db` | Turso / LibSQL connection URL |
-| `TURSO_AUTH_TOKEN` | - | Turso database authentication token |
-| `DEFAULT_SUBSCRIPTION_TITLE` | `LatinaHub Subscription` | Title for generated subscription files |
-| `CACHE_TTL_MINUTES` | `5` | In-memory cache TTL for edge server info |
-| `RATE_LIMIT_RPS` | `20` | Rate limiter requests per second per IP |
+| Variable                     | Default                  | Description                                      |
+| ---------------------------- | ------------------------ | ------------------------------------------------ |
+| `PORT`                       | `8080`                   | HTTP port to listen on                           |
+| `APP_ENV`                    | `development`            | Environment mode (`development` or `production`) |
+| `TURSO_DATABASE_URL`         | `file:local.db`          | Turso / LibSQL connection URL                    |
+| `TURSO_AUTH_TOKEN`           | -                        | Turso database authentication token              |
+| `DEFAULT_SUBSCRIPTION_TITLE` | `LatinaHub Subscription` | Title for generated subscription files           |
+| `CACHE_TTL_MINUTES`          | `5`                      | In-memory cache TTL for edge server info         |
+| `RATE_LIMIT_RPS`             | `20`                     | Rate limiter requests per second per IP          |
 
 ## Endpoints
 

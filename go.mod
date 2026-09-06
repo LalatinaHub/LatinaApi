@@ -4,7 +4,7 @@ go 1.27.1
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/LalatinaHub/common v0.1.1
+	github.com/LalatinaHub/common v0.1.2
 	github.com/gin-contrib/cors v1.7.8
 	github.com/gin-gonic/gin v1.12.0
 	github.com/google/uuid v1.6.0

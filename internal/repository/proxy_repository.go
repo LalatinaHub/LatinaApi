@@ -1,4 +1,4 @@
-﻿package repository
+package repository
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/LalatinaHub/LatinaApi/internal/domain/model"
+	"github.com/LalatinaHub/common/proxy"
 	"github.com/LalatinaHub/common/repository"
 )
 
@@ -32,24 +33,74 @@ func (r *proxyRepo) GetProxiesByFilter(ctx context.Context, filter ProxyFilter) 
 	conditions = append(conditions, "1=1")
 
 	if filter.VPN != "" {
-		conditions = append(conditions, "vpn = ?")
-		args = append(args, strings.ToLower(filter.VPN))
+		vpns := splitAndTrim(filter.VPN)
+		if len(vpns) == 1 {
+			conditions = append(conditions, "vpn = ?")
+			args = append(args, strings.ToLower(vpns[0]))
+		} else if len(vpns) > 1 {
+			placeholders := make([]string, len(vpns))
+			for i, v := range vpns {
+				placeholders[i] = "?"
+				args = append(args, strings.ToLower(v))
+			}
+			conditions = append(conditions, fmt.Sprintf("vpn IN (%s)", strings.Join(placeholders, ",")))
+		}
 	}
 	if filter.CountryCode != "" {
-		conditions = append(conditions, "country_code = ?")
-		args = append(args, strings.ToUpper(filter.CountryCode))
+		ccs := splitAndTrim(filter.CountryCode)
+		if len(ccs) == 1 {
+			conditions = append(conditions, "country_code = ?")
+			args = append(args, strings.ToUpper(ccs[0]))
+		} else if len(ccs) > 1 {
+			placeholders := make([]string, len(ccs))
+			for i, c := range ccs {
+				placeholders[i] = "?"
+				args = append(args, strings.ToUpper(c))
+			}
+			conditions = append(conditions, fmt.Sprintf("country_code IN (%s)", strings.Join(placeholders, ",")))
+		}
 	}
 	if filter.Region != "" {
-		conditions = append(conditions, "region = ?")
-		args = append(args, strings.ToUpper(filter.Region))
+		regions := splitAndTrim(filter.Region)
+		if len(regions) == 1 {
+			conditions = append(conditions, "LOWER(region) = ?")
+			args = append(args, strings.ToLower(regions[0]))
+		} else if len(regions) > 1 {
+			placeholders := make([]string, len(regions))
+			for i, rg := range regions {
+				placeholders[i] = "?"
+				args = append(args, strings.ToLower(rg))
+			}
+			conditions = append(conditions, fmt.Sprintf("LOWER(region) IN (%s)", strings.Join(placeholders, ",")))
+		}
 	}
 	if filter.Transport != "" {
-		conditions = append(conditions, "transport = ?")
-		args = append(args, strings.ToLower(filter.Transport))
+		transports := splitAndTrim(filter.Transport)
+		if len(transports) == 1 {
+			conditions = append(conditions, "transport = ?")
+			args = append(args, strings.ToLower(transports[0]))
+		} else if len(transports) > 1 {
+			placeholders := make([]string, len(transports))
+			for i, t := range transports {
+				placeholders[i] = "?"
+				args = append(args, strings.ToLower(t))
+			}
+			conditions = append(conditions, fmt.Sprintf("transport IN (%s)", strings.Join(placeholders, ",")))
+		}
 	}
 	if filter.ConnMode != "" {
-		conditions = append(conditions, "conn_mode = ?")
-		args = append(args, strings.ToLower(filter.ConnMode))
+		modes := splitAndTrim(filter.ConnMode)
+		if len(modes) == 1 {
+			conditions = append(conditions, "conn_mode = ?")
+			args = append(args, strings.ToLower(modes[0]))
+		} else if len(modes) > 1 {
+			placeholders := make([]string, len(modes))
+			for i, m := range modes {
+				placeholders[i] = "?"
+				args = append(args, strings.ToLower(m))
+			}
+			conditions = append(conditions, fmt.Sprintf("conn_mode IN (%s)", strings.Join(placeholders, ",")))
+		}
 	}
 	if filter.TLS != nil {
 		tlsVal := 0
@@ -118,6 +169,7 @@ func (r *proxyRepo) GetProxiesByFilter(ctx context.Context, filter ProxyFilter) 
 		if err != nil {
 			continue
 		}
+		p.Raw = proxy.DecodeIfBase64(p.Raw)
 		proxies = append(proxies, p)
 	}
 
@@ -126,4 +178,15 @@ func (r *proxyRepo) GetProxiesByFilter(ctx context.Context, filter ProxyFilter) 
 	}
 
 	return proxies, nil
+}
+
+func splitAndTrim(s string) []string {
+	var result []string
+	for _, part := range strings.Split(s, ",") {
+		trimmed := strings.TrimSpace(part)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }
