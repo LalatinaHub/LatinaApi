@@ -1,27 +1,37 @@
-FROM oven/bun:latest AS web
+﻿# Multi-stage production build for LatinaApi
+# Stage 1: Build binary
+FROM golang:1.24-alpine AS builder
 
-WORKDIR /usr/src/web
+WORKDIR /build
 
-COPY web .
+# Install security certificates
+RUN apk add --no-cache ca-certificates tzdata
 
-RUN bun install
-RUN bun run docs:build
+# Copy go modules manifests
+COPY go.mod go.sum ./
+RUN go mod download
 
-FROM golang:latest AS app
-
-WORKDIR /usr/src/app
-
+# Copy source code
 COPY . .
-COPY --from=web /usr/src/web/src/.vitepress/dist web/public/
 
-# Build latinaapi
-RUN go mod edit -dropreplace="github.com/LalatinaHub/LatinaSub-go"
-# RUN go get -v github.com/LalatinaHub/LatinaSub-go@main
-RUN go mod download && go mod tidy && go mod verify
-RUN go build -o ./latinaapi ./cmd/latinaapi/main.go
+# Build statically linked binary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-s -w -extldflags '-static'" \
+    -o /build/bin/api \
+    ./cmd/api
 
-ENV GIN_MODE=release
-ENV API_MODE=true
+# Stage 2: Minimal distroless runtime
+FROM gcr.io/distroless/static-debian12:nonroot
+
+WORKDIR /app
+
+# Copy timezone data & SSL certs
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /build/bin/api /app/api
+
+USER nonroot:nonroot
+
 EXPOSE 8080
 
-CMD ["./latinaapi"]
+ENTRYPOINT ["/app/api"]
