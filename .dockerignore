@@ -1,0 +1,30 @@
+# Git repository
+.git
+.gitignore
+
+# CI/CD and developer tools
+.github
+.air.toml
+
+# Environment files & secrets
+.env*
+!.env.example
+
+# Documentation & notes
+*.md
+TODO.md
+
+# Compiled binaries and temporary directories
+bin/
+tmp/
+*.exe
+*.test
+*.out
+
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
