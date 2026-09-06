@@ -147,9 +147,21 @@ func (s *subscriptionService) GetSubscription(ctx context.Context, req Subscript
 		}
 	}
 
-	// Dynamic domain overrides
+	// Filter nodes by requested mode if mode parameter is provided
+	if req.Mode != "" {
+		var matchedNodes []model.ProxyNode
+		for _, n := range nodes {
+			m := detectNodeMode(&n)
+			if m == "" || matchesFilter(req.Mode, m) {
+				matchedNodes = append(matchedNodes, n)
+			}
+		}
+		nodes = matchedNodes
+	}
+
+	// Dynamic domain overrides based on mode and VPN account type
 	for i := range nodes {
-		applyDomainOverrides(&nodes[i], req.CDN, req.SNI)
+		applyDomainOverrides(&nodes[i], req.Mode, req.CDN, req.SNI)
 	}
 
 	// 3. Format determination
@@ -331,19 +343,57 @@ func (s *subscriptionService) buildPremiumNodes(ctx context.Context, user *model
 	return premiumNodes, nil
 }
 
-func applyDomainOverrides(node *model.ProxyNode, cdnOverride, sniOverride string) {
+func detectNodeMode(node *model.ProxyNode) string {
+	if strings.EqualFold(node.ConnMode, "cdn") {
+		return "cdn"
+	}
+	if strings.EqualFold(node.ConnMode, "sni") {
+		return "sni"
+	}
+	lowRemark := strings.ToLower(node.Remark)
+	if strings.Contains(lowRemark, "cdn") {
+		return "cdn"
+	}
+	if strings.Contains(lowRemark, "sni") {
+		return "sni"
+	}
+	if strings.EqualFold(node.Transport, "ws") || strings.EqualFold(node.Transport, "grpc") {
+		return "cdn"
+	}
+	if node.TLS && (strings.EqualFold(node.Transport, "tcp") || node.Transport == "") {
+		return "sni"
+	}
+	return ""
+}
+
+func applyDomainOverrides(node *model.ProxyNode, reqMode, cdnOverride, sniOverride string) {
 	node.Raw = proxy.DecodeIfBase64(node.Raw)
 	modified := false
-	if cdnOverride != "" && strings.EqualFold(node.ConnMode, "cdn") {
-		node.Server = cdnOverride
-		node.Host = cdnOverride
-		modified = true
+
+	nodeMode := detectNodeMode(node)
+	modeAllowsCDN := reqMode == "" || matchesFilter(reqMode, "cdn")
+	modeAllowsSNI := reqMode == "" || matchesFilter(reqMode, "sni")
+
+	// Jika mode dan akunnya cdn maka sesuaikan field server address dan sni jika ada dengan parameter cdn
+	if (nodeMode == "cdn" || (nodeMode == "" && cdnOverride != "" && !modeAllowsSNI)) && modeAllowsCDN {
+		if cdnOverride != "" {
+			node.Server = cdnOverride
+			// Sesuaikan sni jika ada (TLS aktif atau sudah memiliki SNI sebelumnya)
+			if node.TLS || node.SNI != "" {
+				node.SNI = cdnOverride
+			}
+			modified = true
+		}
 	}
-	if sniOverride != "" && strings.EqualFold(node.ConnMode, "sni") {
-		node.Server = sniOverride
-		node.SNI = sniOverride
-		modified = true
+
+	// Jika mode dan akunnya sni, maka sesuaikan field sni nya dengan parameter sni
+	if (nodeMode == "sni" || (nodeMode == "" && sniOverride != "" && !modeAllowsCDN)) && modeAllowsSNI {
+		if sniOverride != "" {
+			node.SNI = sniOverride
+			modified = true
+		}
 	}
+
 	if modified && node.Raw != "" {
 		if formatted, err := proxy.FormatString(node); err == nil && formatted != "" {
 			node.Raw = formatted

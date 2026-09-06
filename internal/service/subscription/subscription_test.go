@@ -190,6 +190,50 @@ func TestSubscriptionService_SuccessCases(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, resWithFree.Content, "vless://30a88c40-581e-4952-aa4c-8af95686ede0@www.gov.ua:8880")
 	assert.NotContains(t, resWithFree.Content, "dmxlc3M6")
+
+	// 10. mode=cdn with cdn parameter: server and sni set to cdn, host untouched
+	resCDNOnly, err := svc.GetSubscription(ctx, SubscriptionRequest{
+		Token:  "tok-valid",
+		Format: "raw",
+		Mode:   "cdn",
+		CDN:    "104.18.2.2",
+	})
+	require.NoError(t, err)
+	assert.Contains(t, resCDNOnly.Content, "@104.18.2.2:443")
+	assert.Contains(t, resCDNOnly.Content, "sni=104.18.2.2")
+	assert.Contains(t, resCDNOnly.Content, "host=sg01.foolvpn.me")
+	assert.NotContains(t, resCDNOnly.Content, "SNI TCP TLS")
+
+	// 11. mode=sni with sni parameter: sni set to sni, server and host untouched
+	resSNIOnly, err := svc.GetSubscription(ctx, SubscriptionRequest{
+		Token:  "tok-valid",
+		Format: "raw",
+		Mode:   "sni",
+		SNI:    "google.com",
+	})
+	require.NoError(t, err)
+	assert.Contains(t, resSNIOnly.Content, "@sg01.foolvpn.me:443")
+	assert.Contains(t, resSNIOnly.Content, "sni=google.com")
+	assert.Contains(t, resSNIOnly.Content, "host=sg01.foolvpn.me")
+	assert.NotContains(t, resSNIOnly.Content, "@google.com")
+	assert.NotContains(t, resSNIOnly.Content, "CDN WS")
+
+	// 12. mode=cdn,sni with both cdn and sni parameters
+	resBoth, err := svc.GetSubscription(ctx, SubscriptionRequest{
+		Token:  "tok-valid",
+		Format: "raw",
+		Mode:   "cdn,sni",
+		CDN:    "104.18.2.2",
+		SNI:    "google.com",
+	})
+	require.NoError(t, err)
+	// CDN node has server 104.18.2.2 and sni 104.18.2.2
+	assert.Contains(t, resBoth.Content, "@104.18.2.2:443")
+	assert.Contains(t, resBoth.Content, "sni=104.18.2.2")
+	// SNI node has server sg01.foolvpn.me and sni google.com (not server google.com)
+	assert.Contains(t, resBoth.Content, "@sg01.foolvpn.me:443")
+	assert.Contains(t, resBoth.Content, "sni=google.com")
+	assert.NotContains(t, resBoth.Content, "@google.com:443")
 }
 
 func TestSubscriptionService_ErrorCases(t *testing.T) {
