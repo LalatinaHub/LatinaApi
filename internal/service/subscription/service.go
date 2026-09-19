@@ -310,7 +310,7 @@ func (s *subscriptionService) buildPremiumNodes(ctx context.Context, user *model
 				Password:    credential,
 				TLS:         true,
 				Transport:   "grpc",
-				ServiceName: fmt.Sprintf("%s/Tun", vpnProto),
+				ServiceName: fmt.Sprintf("%s", vpnProto),
 				Host:        domain,
 				SNI:         domain,
 				Remark:      fmt.Sprintf("%s CDN gRPC TLS", cityName),
