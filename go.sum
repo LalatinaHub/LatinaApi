@@ -4,6 +4,8 @@ github.com/LalatinaHub/common v0.3.0 h1:CcNasfYvW6ovUb+d28GO3d6bZQmK86rq1R+hNsOw
 github.com/LalatinaHub/common v0.3.0/go.mod h1:T3XI4f3lXv1RrYb+kMar4uZ+sIz9KM5aXlky9JlLOwI=
 github.com/LalatinaHub/common v0.3.1 h1:5kl1nVvIXv112IlL2BFdJ43RDxkjmwxlTY9JIVQspjc=
 github.com/LalatinaHub/common v0.3.1/go.mod h1:T3XI4f3lXv1RrYb+kMar4uZ+sIz9KM5aXlky9JlLOwI=
+github.com/LalatinaHub/common v0.3.2 h1:QK9bv0eLVexNxyUu1p+mp3pwsrLOo/QROnp6YiqM3pM=
+github.com/LalatinaHub/common v0.3.2/go.mod h1:T3XI4f3lXv1RrYb+kMar4uZ+sIz9KM5aXlky9JlLOwI=
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=
 github.com/antlr4-go/antlr/v4 v4.13.0/go.mod h1:pfChB/xh/Unjila75QW7+VU4TSnWnnk9UTnmpPaOR2g=
 github.com/bytedance/gopkg v0.1.4 h1:oZnQwnX82KAIWb7033bEwtxvTqXcYMxDBaQxo5JJHWM=
